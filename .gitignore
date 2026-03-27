@@ -1,0 +1,9 @@
+node_modules/
+dist/
+renderer/dist/
+.playwright-mcp/
+*.png
+!src/renderer/public/assets/*.png
+!src/assets/*.png
+!Original/*.png
+!decompiled/resources/*.png
