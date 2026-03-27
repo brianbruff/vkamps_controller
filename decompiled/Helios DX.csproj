@@ -1,0 +1,39 @@
+<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+  <PropertyGroup>
+    <AssemblyName>Helios DX</AssemblyName>
+    <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
+    <OutputType>WinExe</OutputType>
+    <UseWindowsForms>True</UseWindowsForms>
+    <TargetFramework>net48</TargetFramework>
+    <Prefer32Bit>True</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <LangVersion>12.0</LangVersion>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>app.ico</ApplicationIcon>
+    <RootNamespace />
+  </PropertyGroup>
+  <ItemGroup>
+    <None Remove="resources\power.png" />
+    <None Remove="resources\current2.png" />
+    <None Remove="resources\reverse.png" />
+    <None Remove="resources\reverse2.png" />
+    <None Remove="resources\current.png" />
+    <None Remove="resources\input.png" />
+    <None Remove="resources\zr.ico" />
+    <None Remove="resources\error.wav" />
+    <None Remove="resources\alert.wav" />
+    <EmbeddedResource Include="resources\power.png" LogicalName="resources/power.png" />
+    <EmbeddedResource Include="resources\current2.png" LogicalName="resources/current2.png" />
+    <EmbeddedResource Include="resources\reverse.png" LogicalName="resources/reverse.png" />
+    <EmbeddedResource Include="resources\reverse2.png" LogicalName="resources/reverse2.png" />
+    <EmbeddedResource Include="resources\current.png" LogicalName="resources/current.png" />
+    <EmbeddedResource Include="resources\input.png" LogicalName="resources/input.png" />
+    <EmbeddedResource Include="resources\zr.ico" LogicalName="resources/zr.ico" />
+    <EmbeddedResource Include="resources\error.wav" LogicalName="resources/error.wav" />
+    <EmbeddedResource Include="resources\alert.wav" LogicalName="resources/alert.wav" />
+  </ItemGroup>
+  <ItemGroup />
+</Project>

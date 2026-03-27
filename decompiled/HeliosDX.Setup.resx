@@ -1,0 +1,109 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+<resheader name="resmimetype"><value>text/microsoft-resx</value></resheader><resheader name="version"><value>1.3</value></resheader><resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader><data name="$this.Icon" mimetype="application/x-microsoft.net.object.binary.base64"><value>AAEAAAD/////AQAAAAAAAAAMAgAAAFFTeXN0ZW0uRHJhd2luZywgVmVyc2lvbj00LjAuMC4wLCBD
+dWx0dXJlPW5ldXRyYWwsIFB1YmxpY0tleVRva2VuPWIwM2Y1ZjdmMTFkNTBhM2EFAQAAABNTeXN0
+ZW0uRHJhd2luZy5JY29uAgAAAAhJY29uRGF0YQhJY29uU2l6ZQcEAhNTeXN0ZW0uRHJhd2luZy5T
+aXplAgAAAAIAAAAJAwAAAAX8////E1N5c3RlbS5EcmF3aW5nLlNpemUCAAAABXdpZHRoBmhlaWdo
+dAAACAgCAAAAAAAAAAAAAAAPAwAAAL4QAAACAAABAAEAICAAAAEAIACoEAAAFgAAACgAAAAgAAAA
+QAAAAAEAIAAAAAAAgBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADa2toH6OjoTujo6JTo6OjI6Ojo6ufn5/vn5+f7
+6Ojo6ujo6Mjo6OiU6OjoTtra2gcAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADv7+8Q5+fng+jo6Ovo6Oj/6Ojo/+jo
+6P/o6Oj/6Ojo/+jo6P/o6Oj/6Ojo/+jo6P/o6Oj/6Ojo6+fn54Pv7+8QAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA6OjoWejo6Oro6Oj/
+6Ojo/+jo6P/o6Oj/6Ojo/+jo6P/o6Oj/6Ojo/+jo6P/o6Oj/6Ojo/+jo6P/o6Oj/6Ojo/+jo6Oro
+6OhZAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA////BOfn
+55jo6Oj/6Ojo/+jo6P/o6Oj/6Ojo/+jo6P/o6Oj/6Ojo/+jo6P/o6Oj/6Ojo/+jo6P/o6Oj/6Ojo
+/+jo6P/o6Oj/6Ojo/+jo6P/p6emY////BAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAP///wTn5+eu6Ojo/+jo6P/o6Oj/6Ojo/+jo6P/o6Oj/6Ojo/+jo6P/o6Oj/6Ojo/+jo6P/o
+6Oj/6Ojo/+jo6P/o6Oj/6Ojo/+jo6P/o6Oj/6Ojo/+jo6P/n5+eu////BAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAA5+fnmOjo6P/o6Oj/6Ojo/+jo6P/o6Oj/6Ojo/+jo6P/o6Oj/6Ojo
+/+jo6P/o6Oj/6Ojo/+jo6P/o6Oj/6Ojo/+jo6P/o6Oj/6Ojo/+jo6P/o6Oj/6Ojo/+jo6P/p6emY
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAOjo6Fno6Oj/6Ojo/+jo6P/o6Oj/6Ojo/+jo6P/o
+6Oj/6Ojo/+jo6P/o6Oj/6Ojo/+jo6P/o6Oj/6Ojo/+jo6P/o6Oj/6Ojo/+jo6P/o6Oj/6Ojo/+jo
+6P/o6Oj/6Ojo/+jo6P/o6OhZAAAAAAAAAAAAAAAAAAAAAAAAAADv7+8Q6Ojo6ujo6P/o6Oj/6Ojo
+/+jo6P/o6Oj/6Ojo/+jo6P/o6Oj/6Ojo/+jo6P/o6Oj/t73h/7a84f/o6Oj/6Ojo/+jo6P/o6Oj/
+6Ojo/+jo6P/o6Oj/6Ojo/+jo6P/o6Oj/6Ojo/+jo6Orv7+8QAAAAAAAAAAAAAAAAAAAAAOfn54Po
+6Oj/6Ojo/+jo6P/o6Oj/6Ojo/+jo6P/o6Oj/6Ojo/+jo6P/o6Oj/6Ojo/73C4v8FIsn/BSLJ/73C
+4v/o6Oj/6Ojo/+jo6P/o6Oj/6Ojo/+jo6P/o6Oj/6Ojo/+jo6P/o6Oj/6Ojo/+fn54MAAAAAAAAA
+AAAAAADa2toH6Ojo6+jo6P/o6Oj/6Ojo/+jo6P/o6Oj/6Ojo/+jo6P/o6Oj/6Ojo/+jo6P/o6Oj/
+xMjj/wklyv8JJcr/w8jj/+jo6P/o6Oj/6Ojo/+jo6P/o6Oj/6Ojo/+jo6P/o6Oj/6Ojo/+jo6P/o
+6Oj/6Ojo69ra2gcAAAAAAAAAAOjo6E7o6Oj/6Ojo/+jo6P/o6Oj/6Ojo/+jo6P/o6Oj/6Ojo/+jo
+6P/o6Oj/xr+n/+Pi3v/o6Oj/yc3j/8nN4//o6Oj/4+Le/8a/p//o6Oj/6Ojo/+jo6P/o6Oj/6Ojo
+/+jo6P/o6Oj/6Ojo/+jo6P/o6Oj/6OjoTgAAAAAAAAAA6OjolOjo6P/o6Oj/6Ojo/+jo6P/o6Oj/
+6Ojo/+jo6P/o6Oj/6Ojo/7+2mP98Xwz/jng1/87Jtv/n5+f/5+fn/87Jt/+OeDb/fF8M/7+2mP/o
+6Oj/6Ojo/+jo6P/o6Oj/6Ojo/+jo6P/o6Oj/6Ojo/+jo6P/o6OiUAAAAAAAAAADo6OjI6Ojo/+jo
+6P/o6Oj/6Ojo/+jo6P/o6Oj/6Ojo/+jo6P/o6Oj/v7SU/39iD/9/Yg//e14L/39mGP9/Zhj/e14L
+/39iD/9/Yg//v7SU/+jo6P/o6Oj/6Ojo/+jo6P/o6Oj/6Ojo/+jo6P/o6Oj/6Ojo/+jo6MgAAAAA
+AAAAAOjo6Oro6Oj/6Ojo/+jo6P/o6Oj/6Ojo/+jo6P/o6Oj/ua6M/8C3m//n5+f/vbGP/4RpGv9/
+Yg//f2IP/39iD/9/Yg//hGka/72xj//n5+f/wLeb/7mujP/o6Oj/6Ojo/+jo6P/o6Oj/6Ojo/+jo
+6P/o6Oj/6Ojo6gAAAAAAAAAA5+fn++jo6P/o6Oj/6Ojo/+jo6P/o6Oj/6Ojo/9HMvP99YA3/fWAN
+/62fdP/l5OL/4d/Z/7+0lP+rm2v/q5tr/7+0lP/h39n/5eTi/62fdP99YA7/fWAN/9HMu//o6Oj/
+6Ojo/+jo6P/o6Oj/6Ojo/+jo6P/n5+f7AAAAAAAAAADn5+f76Ojo/+jo6P/o6Oj/6Ojo/+jo6P/o
+6Oj/393W/451L/9/Yg//fWEN/4ZuJf+ypoD/1NDC/+Tj4f/k5OH/1NDC/7KngP+GbiX/fWEN/39i
+D/+OdS//393W/+jo6P/o6Oj/6Ojo/+jo6P/o6Oj/6Ojo/+fn5/sAAAAAAAAAAOjo6Oro6Oj/6Ojo
+/+jo6P/o6Oj/tamE/5B7Of/f3db/393X/52ITv9/Yg//f2IP/35hDv96Xgr/eFwI/3hcCP96Xgr/
+fmEO/39iD/9/Yg//nYhO/9/d1//f3db/kHs5/7WphP/o6Oj/6Ojo/+jo6P/o6Oj/6Ojo6gAAAAAA
+AAAA6OjoyOjo6P/o6Oj/6Ojo/+jo6P+AZBP/fmEO/4hxKf/Szb7/5+fn/8a9ov+UfTz/f2IP/39i
+D/9/Yg//f2IP/39iD/9/Yg//lH07/8a9ov/n5+f/0s6+/4hxKf9+YQ7/f2QT/+jo6P/o6Oj/6Ojo
+/+jo6P/o6OjIAAAAAAAAAADo6OiU6Ojo/+jo6P/o6Oj/6Ojo/7uui/9/YhD/f2IP/31hEP+ommz/
+3dvU/+jo6P/a1sv/w7mc/7irhf+4q4X/w7mc/9rWy//o6Oj/3dvU/6mabP99YRD/f2IP/39iEP+7
+rov/6Ojo/+jo6P/o6Oj/6Ojo/+jo6JQAAAAAAAAAAOjo6E7o6Oj/6Ojo/+jo6P/o6Oj/6Ojo/8W7
+oP+EaRv/f2IP/35hDv98YQ//mYZM/7ariP/MxrL/1tPG/9bTxv/MxrL/tqyI/5mGTP98YQ//fmEO
+/39iD/+EaRv/xbug/+jo6P/o6Oj/6Ojo/+jo6P/o6Oj/6OjoTgAAAAAAAAAA2traB+jo6Ovo6Oj/
+6Ojo/+jo6P/o6Oj/6Ojo/9vXzv+hjVX/f2IP/39iD/9/Yg//fmEO/3tfC/96Xgr/el4K/3tfC/9+
+YQ7/f2IP/39iD/9/Yg//oY1V/9vXzv/o6Oj/6Ojo/+jo6P/o6Oj/6Ojo/+jo6Ova2toHAAAAAAAA
+AAAAAAAA5+fng+jo6P/o6Oj/6Ojo/+jo6P/o6Oj/6Ojo/+jo6P/V0MH/rJts/4tyKf9/Yg//f2IP
+/39iD/9/Yg//f2IP/39iD/+Lcin/rJts/9XQwf/o6Oj/6Ojo/+jo6P/o6Oj/6Ojo/+jo6P/o6Oj/
+5+fngwAAAAAAAAAAAAAAAAAAAADv7+8Q6Ojo6ujo6P/o6Oj/6Ojo/+jo6P/o6Oj/6Ojo/+jo6P/o
+6Oj/5+fn/9zZ0P/NxrH/xLqf/8S7n//NxrH/3NnQ/+fn5//o6Oj/6Ojo/+jo6P/o6Oj/6Ojo/+jo
+6P/o6Oj/6Ojo/+jo6Orv7+8QAAAAAAAAAAAAAAAAAAAAAAAAAADo6OhZ6Ojo/+jo6P/o6Oj/6Ojo
+/+jo6P/o6Oj/6Ojo/+jo6P/o6Oj/6Ojo/+jo6P/o6Oj/6Ojo/+jo6P/o6Oj/6Ojo/+jo6P/o6Oj/
+6Ojo/+jo6P/o6Oj/6Ojo/+jo6P/o6Oj/6OjoWQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADn
+5+eY6Ojo/+jo6P/o6Oj/6Ojo/+jo6P/o6Oj/6Ojo/+jo6P/o6Oj/6Ojo/+jo6P/o6Oj/6Ojo/+jo
+6P/o6Oj/6Ojo/+jo6P/o6Oj/6Ojo/+jo6P/o6Oj/6Ojo/+fn55gAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAP///wTn5+eu6Ojo/+jo6P/o6Oj/6Ojo/+jo6P/o6Oj/6Ojo/+jo6P/o6Oj/
+6Ojo/+jo6P/o6Oj/6Ojo/+jo6P/o6Oj/6Ojo/+jo6P/o6Oj/6Ojo/+jo6P/n5+eu////BAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP///wTn5+eY6Ojo/+jo6P/o6Oj/6Ojo/+jo
+6P/o6Oj/6Ojo/+jo6P/o6Oj/6Ojo/+jo6P/o6Oj/6Ojo/+jo6P/o6Oj/6Ojo/+jo6P/o6Oj/5+fn
+mP///wQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADo6OhZ
+6Ojo6ujo6P/o6Oj/6Ojo/+jo6P/o6Oj/6Ojo/+jo6P/o6Oj/6Ojo/+jo6P/o6Oj/6Ojo/+jo6P/o
+6Oj/6Ojo6ujo6FkAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAADv7+8Q5+fng+jo6Ovo6Oj/6Ojo/+jo6P/o6Oj/6Ojo/+jo6P/o6Oj/6Ojo
+/+jo6P/o6Oj/6Ojo6+fn54Pv7+8QAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA2traB+jo6E7o6OiU6OjoyOjo6Orn
+5+f75+fn++jo6Oro6OjI6OjolOjo6E7a2toHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA///////AA///AAD//gAAf/gAAB/wAAAP8AAAD+AAAAfA
+AAADwAAAA4AAAAGAAAABgAAAAYAAAAGAAAABgAAAAYAAAAGAAAABgAAAAYAAAAGAAAABgAAAAcAA
+AAPAAAAD4AAAB/AAAA/wAAAP+AAAH/4AAH//AAD//8AD//////8L</value></data></root>
