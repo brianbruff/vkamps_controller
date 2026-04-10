@@ -1,0 +1,470 @@
+/* ═══════════════════════════════════════════════════════════════
+   VK AMP Dashboard — Hybrid Overlay Approach
+   Background image provides frame/glow/texture.
+   Overlay zones cover dynamic content areas with matching dark bg.
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Fonts ─────────────────────────────────────────────────── */
+:root {
+  --green: #7cfc00;
+  --green-bright: #00ff41;
+  --green-dim: #3a5f0b;
+  --green-glow: rgba(0, 255, 65, 0.3);
+  --yellow: #ffd700;
+  --red: #ff3333;
+  --red-dim: #8b0000;
+  --panel-bg: #060a02;
+  --panel-bg-light: #0c1206;
+  --text-shadow-green: 0 0 8px rgba(0, 255, 65, 0.6);
+  --font-display: 'Orbitron', 'Share Tech Mono', monospace;
+  --font-body: 'Rajdhani', 'Share Tech Mono', sans-serif;
+}
+
+/* ── Wrapper centers dashboard in viewport ─────────────────── */
+.dashboard-wrapper {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #000;
+}
+
+/* ── Container maintains 1536:1024 (3:2) aspect ratio ──────── */
+.dashboard-container {
+  position: relative;
+  width: 100%;
+  max-width: 1536px;
+  aspect-ratio: 1536 / 1024;
+  max-height: 100vh;
+  overflow: hidden;
+}
+
+@media (min-aspect-ratio: 1536 / 1024) {
+  .dashboard-container {
+    width: auto;
+    height: 100vh;
+  }
+}
+
+/* ── Background image ──────────────────────────────────────── */
+.dashboard-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  pointer-events: none;
+  user-select: none;
+  z-index: 0;
+}
+
+/* ── Overlay layer sits on top of image ────────────────────── */
+.overlay-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+/* ── Generic overlay zone ──────────────────────────────────── */
+.overlay-zone {
+  position: absolute;
+  /* Dark bg to cover original image content underneath */
+  background: var(--panel-bg);
+  color: var(--green);
+  font-family: var(--font-display);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   HEADER
+   ═══════════════════════════════════════════════════════════════ */
+
+.header-ip {
+  top: 2.2%;
+  right: 4%;
+  width: 14%;
+  height: 3.5%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  font-size: clamp(10px, 1.2vw, 18px);
+  font-family: var(--font-body);
+  font-weight: 500;
+  background: transparent;
+  color: #ccc;
+}
+
+.wifi-icon {
+  font-size: 0.9em;
+  filter: hue-rotate(90deg);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   OUTPUT SECTION
+   ═══════════════════════════════════════════════════════════════ */
+
+.output-value {
+  top: 9.5%;
+  left: 28%;
+  width: 28%;
+  height: 9%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: 4px;
+}
+
+.output-number {
+  font-size: clamp(28px, 5vw, 72px);
+  font-weight: 700;
+  color: var(--green-bright);
+  text-shadow: var(--text-shadow-green);
+  letter-spacing: 2px;
+}
+
+.output-unit {
+  font-size: clamp(14px, 2vw, 30px);
+  font-weight: 400;
+  color: #aaa;
+  align-self: flex-end;
+  padding-bottom: 0.5em;
+}
+
+/* ── Output Bar ── */
+.output-bar-zone {
+  top: 21%;
+  left: 3.5%;
+  width: 60%;
+  height: 12%;
+  padding: 1% 1.5%;
+  border-radius: 4px;
+}
+
+/* ── Spectrum ── */
+.spectrum-zone {
+  top: 9.5%;
+  right: 3.5%;
+  width: 27%;
+  height: 23.5%;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.spectrum-canvas {
+  width: 100%;
+  height: 100%;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SMALL METERS (Reflected, Input, Current)
+   ═══════════════════════════════════════════════════════════════ */
+
+.reflected-zone {
+  top: 37%;
+  left: 3.5%;
+  width: 27%;
+  height: 14%;
+  padding: 1% 1.5%;
+  border-radius: 4px;
+}
+
+.input-zone {
+  top: 37%;
+  left: 35%;
+  width: 27%;
+  height: 14%;
+  padding: 1% 1.5%;
+  border-radius: 4px;
+}
+
+.current-zone {
+  top: 37%;
+  right: 3.5%;
+  width: 27%;
+  height: 14%;
+  padding: 1% 1.5%;
+  border-radius: 4px;
+}
+
+.small-meter-header {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 4%;
+}
+
+.small-meter-label {
+  font-family: var(--font-body);
+  font-size: clamp(10px, 1.3vw, 20px);
+  font-weight: 500;
+  color: #ccc;
+}
+
+.small-meter-value {
+  font-size: clamp(16px, 2.2vw, 34px);
+  font-weight: 700;
+  color: var(--green-bright);
+  text-shadow: var(--text-shadow-green);
+}
+
+.small-meter-unit {
+  font-size: clamp(10px, 1.1vw, 16px);
+  color: #aaa;
+  font-weight: 400;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   BAR METER COMPONENT
+   ═══════════════════════════════════════════════════════════════ */
+
+.bar-meter {
+  width: 100%;
+}
+
+.bar-track {
+  position: relative;
+  width: 100%;
+  height: clamp(10px, 2vw, 24px);
+  background: linear-gradient(180deg, #0a1200 0%, #060e00 100%);
+  border: 1px solid var(--green-dim);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.bar-fill {
+  position: relative;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    #004400 0%,
+    #00aa00 20%,
+    #00ff00 50%,
+    #66ff00 70%,
+    #aaff00 85%,
+    #ffff00 95%,
+    #ff6600 100%
+  );
+  border-radius: 2px;
+  transition: width 0.3s ease-out;
+  box-shadow:
+    0 0 10px rgba(0, 255, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.bar-glow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 40%;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.15) 0%, transparent 100%);
+  border-radius: 2px 2px 0 0;
+}
+
+.bar-redzone {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  background: rgba(255, 0, 0, 0.08);
+  border-left: 2px solid var(--red-dim);
+}
+
+.bar-scale {
+  position: relative;
+  height: 18px;
+  margin-top: 2px;
+}
+
+.bar-scale span {
+  position: absolute;
+  transform: translateX(-50%);
+  font-size: clamp(7px, 0.8vw, 12px);
+  font-family: var(--font-body);
+  color: #8a8;
+}
+
+.bar-scale .scale-danger {
+  color: var(--red);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   STATUS ROW
+   ═══════════════════════════════════════════════════════════════ */
+
+.status-row {
+  top: 54%;
+  left: 3.5%;
+  right: 3.5%;
+  width: auto;
+  height: 5%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10%;
+  background: transparent;
+  font-family: var(--font-body);
+  font-size: clamp(11px, 1.3vw, 20px);
+  font-weight: 600;
+}
+
+.status-item {
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.status-ok {
+  color: var(--green);
+  text-shadow: var(--text-shadow-green);
+}
+
+.status-err {
+  color: var(--red);
+  text-shadow: 0 0 8px rgba(255, 0, 0, 0.6);
+}
+
+.on-air.active {
+  color: var(--green-bright);
+  text-shadow: var(--text-shadow-green);
+  font-weight: 700;
+  font-size: clamp(14px, 1.8vw, 26px);
+}
+
+.fan-auto {
+  color: var(--green);
+  text-shadow: var(--text-shadow-green);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   INFO CARDS ROW
+   ═══════════════════════════════════════════════════════════════ */
+
+.info-row {
+  top: 61%;
+  left: 3.5%;
+  right: 3.5%;
+  width: auto;
+  height: 16%;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: clamp(4px, 0.6vw, 10px);
+  background: transparent;
+  padding: 0.5% 0;
+}
+
+.info-card {
+  background: var(--panel-bg);
+  border: 1px solid var(--green-dim);
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4% 2%;
+  box-shadow:
+    0 0 6px rgba(0, 255, 0, 0.08),
+    inset 0 0 20px rgba(0, 0, 0, 0.5);
+}
+
+.info-card-content {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.info-icon {
+  font-size: clamp(10px, 1vw, 16px);
+}
+
+.info-value {
+  font-size: clamp(16px, 2.5vw, 38px);
+  font-weight: 700;
+  color: var(--green-bright);
+  text-shadow: var(--text-shadow-green);
+  font-family: var(--font-display);
+}
+
+.info-unit {
+  font-size: clamp(10px, 1.1vw, 18px);
+  color: #aaa;
+  font-weight: 400;
+}
+
+.info-label {
+  font-size: clamp(8px, 0.9vw, 14px);
+  color: #8a8;
+  font-family: var(--font-body);
+  margin-top: 4px;
+  text-transform: capitalize;
+  letter-spacing: 0.5px;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   ACTION BUTTONS ROW
+   ═══════════════════════════════════════════════════════════════ */
+
+.action-row {
+  top: 80%;
+  left: 3.5%;
+  right: 3.5%;
+  width: auto;
+  height: 16%;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: clamp(4px, 0.6vw, 10px);
+  background: transparent;
+  padding: 0.5% 0;
+}
+
+.action-btn {
+  background: var(--panel-bg);
+  border: 1px solid var(--green-dim);
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4% 2%;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  box-shadow:
+    0 0 6px rgba(0, 255, 0, 0.08),
+    inset 0 0 20px rgba(0, 0, 0, 0.5);
+}
+
+.action-btn:hover {
+  border-color: var(--green);
+  box-shadow:
+    0 0 15px var(--green-glow),
+    inset 0 0 20px rgba(0, 255, 0, 0.05);
+}
+
+.action-btn:active {
+  background: #0a1a04;
+  transform: scale(0.97);
+}
+
+.action-icon {
+  font-size: clamp(18px, 2.5vw, 38px);
+  color: var(--green);
+  text-shadow: var(--text-shadow-green);
+  margin-bottom: 4px;
+}
+
+.action-label {
+  font-size: clamp(9px, 1vw, 16px);
+  color: var(--green);
+  font-family: var(--font-body);
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}

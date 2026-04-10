@@ -7,3 +7,4 @@ renderer/dist/
 !src/assets/*.png
 !Original/*.png
 !decompiled/resources/*.png
+docs/option1/node_modules/

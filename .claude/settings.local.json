@@ -1,7 +1,9 @@
 {
   "permissions": {
     "allow": [
-      "Bash(dotnet tool:*)"
+      "Bash(dotnet tool:*)",
+      "Bash(find /Users/bek/Data/Repo/github/vkamps_controller -name vite.config.* -o -name electron-builder.json -o -name tsconfig.json)",
+      "WebFetch(domain:sharpedgemedia.ie)"
     ]
   }
 }
