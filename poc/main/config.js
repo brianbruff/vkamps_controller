@@ -38,11 +38,30 @@ const store = new Store({
 });
 
 let _loadLogged = false;
+let _migrationApplied = false;
 function getConfig() {
   const cfg = {};
   for (const key of Object.keys(DEFAULTS)) {
     cfg[key] = store.get(key, DEFAULTS[key]);
   }
+
+  // One-time migration: any persisted config left over from the original
+  // USB-default build will read back mode='USB'. If the user never set a
+  // COM port they clearly didn't intentionally pick serial — bump them to
+  // TCP so a third-party LAN tester isn't stuck on the wrong transport.
+  if (!_migrationApplied && cfg.mode === 'USB' && !cfg.comPort) {
+    cfg.mode = 'TCP';
+    store.set('mode', 'TCP');
+    _migrationApplied = true;
+    try {
+      diag.info('config', 'Migrated persisted mode USB→TCP (no COM port set)', {
+        reason: 'config carry-over from pre-TCP-default build',
+      });
+    } catch {}
+  } else {
+    _migrationApplied = true;
+  }
+
   if (!_loadLogged) {
     _loadLogged = true;
     try {
