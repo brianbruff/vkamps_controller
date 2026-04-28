@@ -8,7 +8,9 @@ const DEFAULTS = {
   baudRate: 600,
   windowX: 0,
   windowY: 0,
-  mode: 'USB',
+  // POC default targets a networked amplifier — most third-party testers
+  // will connect over LAN. Switch to 'USB' in Settings if using a serial cable.
+  mode: 'TCP',
   lanIp: '192.168.0.55',
   tcpPort: 5005,
   udpPort: 5010,

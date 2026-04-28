@@ -6,7 +6,7 @@ const DEFAULTS = {
   baudRate: 600,
   windowX: 0,
   windowY: 0,
-  mode: 'USB',
+  mode: 'TCP',
   lanIp: '192.168.0.55',
   tcpPort: 5005,
   udpPort: 5010,

@@ -50,7 +50,7 @@ jobs:
         shell: pwsh
         run: Get-ChildItem -Recurse dist-electron | Select-Object FullName, Length
 
-      - name: Upload installer + portable
+      - name: Upload installer + portable + docs
         uses: actions/upload-artifact@v4
         with:
           name: vkamp-poc-windows-${{ github.run_number }}
@@ -58,5 +58,6 @@ jobs:
             poc/dist-electron/*.exe
             poc/dist-electron/*.blockmap
             poc/dist-electron/latest*.yml
+            poc/poc_detail.md
           if-no-files-found: error
           retention-days: 30
