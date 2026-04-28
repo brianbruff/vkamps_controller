@@ -1,0 +1,62 @@
+name: Build Windows POC
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: "Branch, tag, or SHA to build (default: current)"
+        required: false
+        default: ""
+
+jobs:
+  build:
+    name: electron-builder (windows-latest, x64)
+    runs-on: windows-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: poc
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.ref || github.ref }}
+
+      - name: Setup Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: poc/package-lock.json
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+        env:
+          # Skip Electron download retries hanging the runner
+          ELECTRON_CACHE: ${{ github.workspace }}\.cache\electron
+          ELECTRON_BUILDER_CACHE: ${{ github.workspace }}\.cache\electron-builder
+
+      - name: Build renderer + package Windows installer
+        run: npm run dist:win
+        env:
+          # No code signing on CI — keep electron-builder from looking for certs
+          CSC_IDENTITY_AUTO_DISCOVERY: "false"
+          ELECTRON_CACHE: ${{ github.workspace }}\.cache\electron
+          ELECTRON_BUILDER_CACHE: ${{ github.workspace }}\.cache\electron-builder
+
+      - name: List build output
+        if: always()
+        shell: pwsh
+        run: Get-ChildItem -Recurse dist-electron | Select-Object FullName, Length
+
+      - name: Upload installer + portable
+        uses: actions/upload-artifact@v4
+        with:
+          name: vkamp-poc-windows-${{ github.run_number }}
+          path: |
+            poc/dist-electron/*.exe
+            poc/dist-electron/*.blockmap
+            poc/dist-electron/latest*.yml
+          if-no-files-found: error
+          retention-days: 30

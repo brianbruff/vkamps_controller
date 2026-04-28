@@ -8,3 +8,7 @@ renderer/dist/
 !Original/*.png
 !decompiled/resources/*.png
 docs/option1/node_modules/
+poc/node_modules/
+poc/renderer/dist/
+poc/dist-electron/
+.claude/
