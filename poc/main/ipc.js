@@ -10,6 +10,10 @@ const { CMD, VOLTAGE_CMDS, CAT_CMDS } = require('./protocol');
 
 const USE_MOCK = process.env.VKAMP_MOCK === '1';
 
+// Hard cap on a single connect attempt before we give up and tear down.
+// TCP/serial otherwise inherit OS-level timeouts that can be ~75 s.
+const CONNECT_TIMEOUT_MS = Number(process.env.VKAMP_CONNECT_TIMEOUT_MS) || 15000;
+
 let transport = USE_MOCK ? new MockTransport() : new Transport();
 let mainWindow = null;
 
@@ -65,9 +69,38 @@ function setupIPC(win) {
 
   ipcMain.handle('amp:connect', async () => {
     const cfg = config.getConfig();
+    const target = cfg.mode === 'USB'
+      ? `${cfg.comPort || '(unset)'} @ ${cfg.baudRate}`
+      : `${cfg.lanIp}:${cfg.tcpPort}`;
+
+    let timeoutHandle = null;
+    let timedOut = false;
+    const timeoutPromise = new Promise((_, reject) => {
+      timeoutHandle = setTimeout(() => {
+        timedOut = true;
+        const err = new Error(`Connection timed out after ${CONNECT_TIMEOUT_MS / 1000}s`);
+        err.code = 'EVKAMPCONNECTTIMEOUT';
+        reject(err);
+      }, CONNECT_TIMEOUT_MS);
+    });
+
+    const startedAt = Date.now();
     try {
-      await transport.connect(cfg);
+      await Promise.race([transport.connect(cfg), timeoutPromise]);
+      clearTimeout(timeoutHandle);
     } catch (err) {
+      clearTimeout(timeoutHandle);
+      const elapsedMs = Date.now() - startedAt;
+      if (timedOut) {
+        diag.error('transport', `Connect timed out after ${CONNECT_TIMEOUT_MS / 1000}s — abandoning attempt`, {
+          mode: cfg.mode,
+          target,
+          timeoutMs: CONNECT_TIMEOUT_MS,
+          elapsedMs,
+        });
+        // Tear down any half-open sockets/ports before surfacing the error.
+        try { transport.disconnect(); } catch {}
+      }
       // Re-throw so the renderer's invoke() rejects.
       throw err;
     }
