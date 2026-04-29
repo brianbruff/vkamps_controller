@@ -46,7 +46,11 @@ export async function loadSettings() {
 export async function saveSettings(patch = {}) {
   Object.assign(settings, patch);
   if (window.api) {
-    try { await window.api.saveConfig({ ...settings }); }
+    // Strip Svelte $state proxies — Electron IPC's structured clone can't
+    // serialize them, which silently rejects the call and leaves the store
+    // un-persisted.
+    const payload = $state.snapshot(settings);
+    try { await window.api.saveConfig(payload); }
     catch (e) { console.warn('saveSettings failed', e); }
   }
 }
