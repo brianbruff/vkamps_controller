@@ -12,6 +12,7 @@ class Transport extends EventEmitter {
     this.udp = null;
     this.mode = null;
     this.connected = false;
+    this._lastP9 = 0;
   }
 
   async connect(config) {
@@ -34,7 +35,22 @@ class Transport extends EventEmitter {
       this.tcp = new TcpTransport();
       this.udp = new UdpTransport();
 
-      this.tcp.on('data', (pkt) => this.emit('data', pkt));
+      this.tcp.on('data', (pkt) => {
+        // Match legacy Helios DX behavior (Main.cs:1371-1376): on every p9
+        // transition 0→1 (TX idle→active) re-kick the UDP stream by re-sending
+        // "11". The amp's UDP firmware only streams p1/p2/p4/p12 telemetry
+        // while TX is keyed and stops between bursts; without this re-kick
+        // we never see output/reflected/current/input power.
+        if (pkt && pkt.type === 'tcp' && pkt.data && typeof pkt.data.p9 === 'number') {
+          const p9 = pkt.data.p9;
+          if (this._lastP9 === 0 && p9 !== 0 && this.udp && this.udp.connected) {
+            diag.info('transport', 'TX active (p9 0→1) — re-kicking UDP stream', { p9 });
+            this.udp.sendCommand('11');
+          }
+          this._lastP9 = p9;
+        }
+        this.emit('data', pkt);
+      });
       this.udp.on('data', (pkt) => this.emit('data', pkt));
 
       this.tcp.on('error', (err) => this.emit('error', err));
@@ -94,6 +110,7 @@ class Transport extends EventEmitter {
     }
     this.connected = false;
     this.mode = null;
+    this._lastP9 = 0;
   }
 
   async listPorts() {
