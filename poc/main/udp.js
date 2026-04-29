@@ -22,7 +22,7 @@ class UdpTransport extends EventEmitter {
       this.remotePort = udpPort;
       diag.info('transport', `UDP binding (target ${lanIp}:${udpPort})`, { host: lanIp, port: udpPort });
 
-      this.socket = dgram.createSocket('udp4');
+      this.socket = dgram.createSocket({ type: 'udp4', reuseAddr: true });
 
       this.socket.on('message', (msg) => {
         const text = msg.toString('utf8');
@@ -61,7 +61,11 @@ class UdpTransport extends EventEmitter {
         reject(err);
       });
 
-      this.socket.bind(() => {
+      // Bind locally to the same UDP port the amp listens on. The amp firmware
+      // streams real-time telemetry to a fixed destination port (not the
+      // ephemeral source of our init packet); without an explicit local-port
+      // bind we silently miss every packet after the first reply.
+      this.socket.bind(udpPort, () => {
         const initMsg = Buffer.from('11', 'utf8');
         this.socket.send(initMsg, 0, initMsg.length, this.remotePort, this.remoteIp, (err) => {
           if (err) {
@@ -71,7 +75,10 @@ class UdpTransport extends EventEmitter {
             return reject(err);
           }
           diag.info('tx', `→ "11"`, { bytes: '11', length: 2, transport: 'udp', reason: 'init' });
-          diag.info('transport', `UDP bound (sending to ${this.remoteIp}:${this.remotePort})`, { host: this.remoteIp, port: this.remotePort });
+          const localPort = (() => { try { return this.socket.address().port; } catch { return udpPort; } })();
+          diag.info('transport', `UDP bound (local :${localPort}, sending to ${this.remoteIp}:${this.remotePort})`, {
+            localPort, host: this.remoteIp, port: this.remotePort,
+          });
           this.connected = true;
           this.emit('connected');
           resolve();
