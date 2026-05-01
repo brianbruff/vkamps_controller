@@ -130,7 +130,7 @@ All subscribed in `App.svelte:onMount` and `DiagnosticsView`.
 ## 9. Issues / gaps worth noting
 
 1. **Sound alerts checkbox** is stored but no audio is hooked up.
-2. **Antenna cycling** ignores the per-band antenna map — always 1→4.
+2. **Antenna cycling** ignores the per-band antenna map — always 1→3.
 3. **`amp:getProtocol`** IPC is exposed in preload but no renderer code calls it. Dead weight, harmless.
 4. **`amp:sendCommand`** is fire-and-forget on the renderer side (no `await`). That's intentional — telemetry confirms state change — but it means a failed send (e.g., transport closed) doesn't surface to the user except via the diag log.
 5. **No-op cmds when not connected**: footer/pill/card clicks send commands even with no transport open; `transport.sendCommand` silently no-ops. Intentional but the user gets no feedback that the click "didn't take." A small improvement would be to disable interactive controls when `transportState.status !== 'open'`.

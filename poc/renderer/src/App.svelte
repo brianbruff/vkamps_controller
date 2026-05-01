@@ -156,7 +156,7 @@
 
   // Stat-card click handlers
   function onAntennaCycle() {
-    const max = 4;
+    const max = 3;
     const next = (deviceState.antenna % max) + 1;
     send(String(30 + next));
     deviceState.antenna = next;

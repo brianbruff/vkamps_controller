@@ -93,7 +93,6 @@ On disconnect/exit: Send `"99"` before closing.
 | `"31"`  | Select Antenna 1 |
 | `"32"`  | Select Antenna 2 |
 | `"33"`  | Select Antenna 3 |
-| `"34"`  | Select Antenna 4 |
 | `"41"`  | Volts Normal |
 | `"42"`  | Volts+ (boost) |
 | `"44"`  | Sleep / Standby |
@@ -182,7 +181,7 @@ Config is stored in a plain text file (`save.txt`) — one value per line:
 | 8 | Always On Top | `"true"` / `"false"` | `"false"` |
 | 9 | Bypass state | `"true"` / `"false"` | `"false"` |
 | 10 | Temperature Unit | `"C"` or `"F"` | `"C"` |
-| 11 | Antenna number (current) | `"1"`–`"4"` | `"1"` |
+| 11 | Antenna number (current) | `"1"`–`"3"` | `"1"` |
 | 12 | Volts mode | `"true"` / `"false"` | `"false"` |
 | 13 | Power/Koef | `"600"`, `"1200"`, `"2400"` | `"600"` |
 | 14 | Voltage Reference | `"48"`, `"50"`, `"53.5"`, `"58.3"` | `"48"` |
@@ -222,7 +221,7 @@ Dark theme. Key display elements:
 | **Temperature display** (`p3`) | Numeric, °C or °F selectable |
 | **Voltage display** (`p5`) | Numeric, tenths (e.g. `48.0 V`) |
 | **Band label** | Current band (160m, 80m … 6m) |
-| **Antenna indicator** | Current antenna number (1–4) |
+| **Antenna indicator** | Current antenna number (1–3) |
 | **Status/Error label** | Shows error text, clickable to reset |
 | **ON AIR / ByPass label** | Clickable — toggles bypass, shows TX state |
 | **Fan label** | Clickable — toggles Fan Auto / Fan 100% |
