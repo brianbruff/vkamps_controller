@@ -18,6 +18,8 @@ export const appConfig = writable({
   antennaMap: [1, 1, 1, 1, 1, 1, 1, 1],
   sound: true,
   inputIndicator: false,
+  // Peak hold duration in milliseconds (500-2500ms, default 2000ms)
+  peakHoldDuration: 2000,
 });
 
 export async function loadConfig() {
