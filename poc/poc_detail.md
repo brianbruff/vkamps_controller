@@ -30,14 +30,14 @@ Every interactive surface in the renderer, what it does, the IPC channel it hits
 
 | Card | Type | Click behavior | Cmd | Wired? |
 |---|---|---|---|---|
-| **ANTENNA** | cycle | 1 → 2 → 3 → 4 → 1 | `31` / `32` / `33` / `34` | ✅ |
+| **ANTENNA** | cycle | 1 → 2 → 3 → 1 | `31` / `32` / `33` | ✅ |
 | **BAND** | cycle (only when CAT = Manual) | next of 160/80/40/30/20/17–15/12–10/6 | `71`…`78` | ✅ — gated on `settings.cat === 5` |
 | **SWR** | readonly | — | — | n/a |
 | **EFFICIENCY** | readonly | — | — | n/a |
 | **VOLTS** | toggle | flips between Normal / Volts+ | `41` / `42` | ✅ |
 | **TEMP** | readonly | — | — | n/a |
 
-> ⚠️ Known limitation: ANTENNA cycles raw 1→4 and does **not** consult the per-band antenna map in settings. Listed as a deferred TODO in the design.
+> ⚠️ Known limitation: ANTENNA cycles raw 1→3 and does **not** consult the per-band antenna map in settings. Listed as a deferred TODO in the design.
 
 ---
 
