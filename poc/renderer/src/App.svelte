@@ -1,13 +1,17 @@
 <script>
   import { onMount } from 'svelte';
 
-  import TesterBanner from './lib/chrome/TesterBanner.svelte';
   import HeaderBar from './lib/chrome/HeaderBar.svelte';
   import OutputMeter from './lib/meters/OutputMeter.svelte';
   import MeterBar from './lib/meters/MeterBar.svelte';
   import StatusPill from './lib/status/StatusPill.svelte';
-  import StatCard from './lib/cards/StatCard.svelte';
+  import AntennaTile from './lib/cards/AntennaTile.svelte';
+  import BandTile from './lib/cards/BandTile.svelte';
+  import SwrTile from './lib/cards/SwrTile.svelte';
+  import VoltTile from './lib/cards/VoltTile.svelte';
+  import TempTile from './lib/cards/TempTile.svelte';
   import ControlButton from './lib/controls/ControlButton.svelte';
+  import OperateToggle from './lib/controls/OperateToggle.svelte';
   import SettingsModal from './lib/settings/SettingsModal.svelte';
   import DiagnosticsView from './lib/diagnostics/DiagnosticsView.svelte';
 
@@ -37,6 +41,7 @@
   const INPUT_MAX = 100;
 
   const BANDS = ['160m', '80m', '40m', '30m', '20m', '17–15m', '12–10m', '6m'];
+  const BAND_FREQ = ['1.84 MHz', '3.65 MHz', '7.10 MHz', '10.10 MHz', '14.20 MHz', '18.10 MHz', '24.94 MHz', '50.10 MHz'];
   const ERRORS = {
     0: 'STATUS OK',
     1: 'ERR INPUT',
@@ -87,7 +92,6 @@
       } else if (pkt.type === 'tcp' && pkt.data) {
         applyStatePacket(pkt.data);
         applyStateMeters(pkt.data);
-        // Any inbound state packet clears the local "sleeping" latch
         if (sleeping) sleeping = false;
       }
     });
@@ -100,12 +104,8 @@
       setError(msg || 'Unknown transport error');
     });
 
-    // No auto-connect — the user clicks Connect in the header. This makes the
-    // POC ship-safe: a misconfigured tester won't get a confusing failure
-    // dialog before they've even seen the UI.
     setStatus('closed');
 
-    // Apply always-on-top from settings
     if (settings.alwaysOnTop) {
       try { window.api.setAlwaysOnTop(true); } catch {}
     }
@@ -120,7 +120,6 @@
   // ---- Command helpers ----
   function send(cmd) { if (window.api) window.api.send(String(cmd)); }
 
-  // Footer buttons
   function onReset() {
     send('23');
     sleeping = false;
@@ -134,40 +133,37 @@
   function onBypass() {
     const next = !deviceState.bypass;
     send(next ? '21' : '22');
-    deviceState.bypass = next; // optimistic
+    deviceState.bypass = next;
   }
   function onSetup() { settingsOpen = true; }
   function onDiagnostics() { diagOpen = true; }
   function onNeedSetup() { settingsOpen = true; }
 
-  // Status-pill click handlers
-  function onTxPill() {
-    // Mirror of footer Bypass for parity per DESIGN.md §6
+  function onOperateChange(next) {
+    // operate=true means NOT bypass (RF active path)
+    if (next === !deviceState.bypass) return;
     onBypass();
+  }
+
+  function onErrorPill() {
+    if (deviceState.errorCode) onReset();
   }
   function onFanPill() {
     const next = !deviceState.fanFull;
     send(next ? '45' : '46');
     deviceState.fanFull = next;
   }
-  function onErrorPill() {
-    if (deviceState.errorCode) onReset();
-  }
 
-  // Stat-card click handlers
-  function onAntennaCycle() {
-    const max = 3;
-    const next = (deviceState.antenna % max) + 1;
-    send(String(30 + next));
-    deviceState.antenna = next;
+  function onAntennaSelect(n) {
+    send(String(30 + n));
+    deviceState.antenna = n;
   }
 
   const catManual = $derived(settings.cat === 5);
-  function onBandCycle() {
+  function onBandSelect(i) {
     if (!catManual) return;
-    const next = (deviceState.band + 1) % 8;
-    send(String(71 + next));
-    deviceState.band = next;
+    send(String(71 + i));
+    deviceState.band = i;
   }
   function onVoltsToggle() {
     const next = !deviceState.voltsPlus;
@@ -175,125 +171,131 @@
     deviceState.voltsPlus = next;
   }
 
-  // ---- Pill texts ----
-  const errorText = $derived(deviceState.errorCode ? (ERRORS[deviceState.errorCode] || 'ERROR') : 'STATUS OK');
+  // ---- Status chip strings ----
+  const operating = $derived(!deviceState.bypass);
+  const errorText = $derived(deviceState.errorCode ? (ERRORS[deviceState.errorCode] || 'ERROR') : 'Status OK');
   const errorTone = $derived(deviceState.errorCode ? 'error' : 'ok');
-  const txPillTone = $derived(deviceState.bypass ? 'bypass' : (deviceState.txActive ? 'tx' : 'idle'));
-  const txPillLabel = $derived(deviceState.bypass ? 'BYPASS' : (deviceState.txActive ? 'ON AIR' : 'STANDBY'));
-  const fanPillLabel = $derived(deviceState.fanFull ? 'FAN 100%' : 'FAN AUTO');
+  const onAirText = $derived(
+    deviceState.bypass ? 'Bypass' :
+    deviceState.txActive ? 'On Air' : 'Standby'
+  );
+  const onAirTone = $derived(
+    deviceState.bypass ? 'bypass' :
+    deviceState.txActive ? 'tx' : 'idle'
+  );
+  const fanText = $derived(deviceState.fanFull ? 'Fan 100%' : 'Fan Auto');
+  const fanTone = $derived(deviceState.fanFull ? 'fan' : 'idle');
 </script>
 
 <div class="app-shell">
-  <TesterBanner />
-
   <HeaderBar
-    isMock={isMockBuild}
     onneedsetup={onNeedSetup}
     ondiagnostics={onDiagnostics} />
 
   <main class="main">
-    <!-- Output meter (full width) -->
-    <OutputMeter
-      value={outW}
-      max={outputScale.max}
-      ticks={outputScale.ticks}
-      peakHold={peakOutW}
-      label="OUTPUT POWER" />
+    <div class="panel">
+      <!-- Hero output meter -->
+      <OutputMeter
+        value={outW}
+        max={outputScale.max}
+        ticks={outputScale.ticks}
+        peakHold={peakOutW}
+        avg={peakOutW ? Math.round(peakOutW * 0.96) : 0}
+        label="Output Power" />
 
-    <!-- Sub-meters row -->
-    <div class="sub-meters">
-      <MeterBar
-        label="REFLECTED"
-        value={refW}
-        max={reflectedMax}
-        unit="W"
-        peakHold={peakRefW}
-        ticks={[Math.round(reflectedMax/4), Math.round(reflectedMax/2), Math.round(reflectedMax*3/4), reflectedMax]} />
+      <!-- Sub-meters row -->
+      <div class="sub-meters">
+        <MeterBar
+          label="Reflected"
+          icon="arrowDown"
+          sub={`RFL · max ${reflectedMax} W`}
+          value={refW}
+          max={reflectedMax}
+          unit="W"
+          peakHold={peakRefW}
+          ticks={[Math.round(reflectedMax / 4), Math.round(reflectedMax / 2), Math.round(reflectedMax * 3 / 4), reflectedMax]} />
 
-      <MeterBar
-        label="INPUT"
-        value={inW}
-        max={INPUT_MAX}
-        unit="W"
-        ticks={[25, 50, 75, 100]} />
+        <MeterBar
+          label="Input"
+          icon="arrowUp"
+          sub={`DRV · max ${INPUT_MAX} W`}
+          value={inW}
+          max={INPUT_MAX}
+          unit="W"
+          ticks={[25, 50, 75, 100]} />
 
-      <MeterBar
-        label="CURRENT"
-        value={curA}
-        max={currentMax}
-        unit="A"
-        ticks={[Math.round(currentMax/4), Math.round(currentMax/2), Math.round(currentMax*3/4), currentMax]} />
-    </div>
+        <MeterBar
+          label="Current"
+          icon="bolt"
+          spark={operating ? 1 : 0.05}
+          value={curA}
+          max={currentMax}
+          unit="A"
+          decimals={1}
+          ticks={[Math.round(currentMax / 4), Math.round(currentMax / 2), Math.round(currentMax * 3 / 4), currentMax]} />
+      </div>
 
-    <!-- Status pills -->
-    <div class="status-pills">
-      <StatusPill
-        label={errorText}
-        tone={errorTone}
-        active={deviceState.errorCode > 0}
-        onclick={deviceState.errorCode ? onErrorPill : null} />
-      <StatusPill
-        label={txPillLabel}
-        tone={txPillTone}
-        active={deviceState.bypass || deviceState.txActive}
-        onclick={onTxPill} />
-      <StatusPill
-        label={fanPillLabel}
-        tone="fan"
-        active={deviceState.fanFull}
-        onclick={onFanPill} />
-    </div>
+      <!-- Status chip bar -->
+      <div class="statusbar">
+        <StatusPill
+          label={onAirText}
+          tone={onAirTone}
+          active={deviceState.bypass || deviceState.txActive}
+          onclick={onBypass} />
+        <StatusPill
+          label={errorText}
+          tone={errorTone}
+          active={deviceState.errorCode > 0}
+          onclick={deviceState.errorCode ? onErrorPill : null} />
+        <StatusPill
+          label={fanText}
+          tone={fanTone}
+          active={deviceState.fanFull}
+          onclick={onFanPill} />
+        <div class="stat-rest">
+          <div class="stat"><span class="l">Efficiency</span><span class="v">{eff}%</span></div>
+          <div class="stat"><span class="l">SWR</span><span class="v">{swrVal.toFixed(2)}</span></div>
+        </div>
+      </div>
 
-    <!-- Stat cards -->
-    <div class="stat-cards">
-      <StatCard
-        icon="antenna"
-        value={`ANT ${deviceState.antenna}`}
-        label="Antenna"
-        mode="cycle"
-        onactivate={onAntennaCycle} />
+      <!-- Secondary tile row -->
+      <div class="secondary">
+        <AntennaTile
+          active={deviceState.antenna}
+          ports={[1, 2, 3]}
+          showLabels={true}
+          onselect={onAntennaSelect} />
 
-      <StatCard
-        icon=""
-        value={BANDS[deviceState.band] || '—'}
-        label="Band"
-        mode={catManual ? 'cycle' : 'readonly'}
-        enabled={catManual}
-        onactivate={onBandCycle} />
+        <BandTile
+          bands={BANDS}
+          activeIndex={deviceState.band}
+          freq={BAND_FREQ[deviceState.band] || ''}
+          enabled={catManual}
+          onselect={onBandSelect} />
 
-      <StatCard
-        value={swrVal.toFixed(2)}
-        label="SWR"
-        mode="readonly" />
+        <SwrTile value={swrVal} />
 
-      <StatCard
-        value={`${eff}%`}
-        label="Efficiency"
-        mode="readonly" />
+        <VoltTile
+          value={voltage}
+          plus={deviceState.voltsPlus}
+          ontoggle={onVoltsToggle} />
 
-      <StatCard
-        icon="bolt"
-        value={voltage.toFixed(1)}
-        unit={deviceState.voltsPlus ? 'V+' : 'V'}
-        label="Volts"
-        mode="toggle"
-        active={deviceState.voltsPlus}
-        onactivate={onVoltsToggle} />
+        <TempTile
+          value={settings.showFahrenheit ? tempF : tempC}
+          unit={settings.showFahrenheit ? '°F' : '°C'}
+          warnAt={settings.showFahrenheit ? 130 : 55}
+          dangerAt={settings.showFahrenheit ? 165 : 75}
+          max={settings.showFahrenheit ? 250 : 120} />
+      </div>
 
-      <StatCard
-        icon="thermo"
-        value={settings.showFahrenheit ? tempF : tempC}
-        unit={settings.showFahrenheit ? '°F' : '°C'}
-        label="Temp"
-        mode="readonly" />
-    </div>
-
-    <!-- Footer controls -->
-    <div class="footer-controls">
-      <ControlButton icon="reset" label="Reset" onclick={onReset} />
-      <ControlButton icon="sleep" label={sleeping ? 'Asleep' : 'Sleep'} active={sleeping} onclick={onSleep} kind="momentary" tone="warn" />
-      <ControlButton icon="bypass" label="ByPass" kind="toggle" active={deviceState.bypass} onclick={onBypass} />
-      <ControlButton icon="setup" label="Setup" kind="modal" onclick={onSetup} />
+      <!-- Controls -->
+      <div class="controls">
+        <OperateToggle operate={operating} onchange={onOperateChange} />
+        <ControlButton icon="bypass" label="Bypass" kind="toggle" active={deviceState.bypass} onclick={onBypass} />
+        <ControlButton icon="reset"  label="Reset"  onclick={onReset} />
+        <ControlButton icon="moon"   label={sleeping ? 'Asleep' : 'Sleep'} active={sleeping} onclick={onSleep} kind="momentary" tone="warn" />
+        <ControlButton icon="setup"  label="Setup"  kind="modal" onclick={onSetup} />
+      </div>
     </div>
   </main>
 
@@ -304,44 +306,139 @@
 <style>
   .app-shell {
     display: grid;
-    grid-template-rows: auto 56px 1fr;
+    grid-template-rows: 64px 1fr;
     height: 100vh;
-    background: var(--color-bg);
+    background: var(--bg);
   }
 
   .main {
+    padding: 24px 28px;
+    overflow: auto;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  .panel {
+    background: var(--paper);
+    border: 1px solid var(--hairline);
+    border-radius: 18px;
+    box-shadow: var(--shadow-panel);
+    padding: 20px 22px 24px;
     display: grid;
+    /* Hero, sub-meters, and secondary tiles all absorb extra vertical space;
+       status bar and controls stay at their natural height. */
     grid-template-rows:
-      minmax(120px, 1.4fr)
-      minmax(110px, 1fr)
-      44px
-      72px
-      48px;
-    gap: 12px;
-    padding: 12px 16px;
-    background: var(--color-bg);
-    overflow: hidden;
+      minmax(180px, 1.4fr)   /* hero output meter */
+      minmax(160px, 1fr)     /* reflected / input / current */
+      auto                    /* status bar */
+      minmax(180px, 1.3fr)   /* antenna / band / swr / volts / temp */
+      auto;                   /* controls */
+    gap: 16px;
+    width: 100%;
+    margin: 0 auto;
+    flex: 1 1 auto;
+    min-height: 0;
   }
 
   .sub-meters {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 12px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
   }
-  .stat-cards {
-    display: grid;
-    grid-template-columns: repeat(6, 1fr);
-    gap: 8px;
-  }
-  .status-pills {
+
+  .statusbar {
     display: flex;
     gap: 12px;
     align-items: stretch;
+    padding: 12px;
+    background: var(--paper-2);
+    border: 1px solid var(--hairline);
+    border-radius: 14px;
+    height: 52px;
   }
-  .footer-controls {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
+  .stat-rest {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding-right: 8px;
+  }
+  .stat {
+    display: flex;
+    align-items: baseline;
     gap: 8px;
-    align-items: stretch;
+    font-size: 13px;
+  }
+  .stat .l {
+    color: var(--ink-3);
+    font-weight: 500;
+  }
+  .stat .v {
+    color: var(--ink);
+    font-weight: 600;
+    font-family: var(--font-num);
+  }
+
+  .secondary {
+    display: grid;
+    grid-template-columns: 1.4fr 1.6fr 1fr 1fr 1fr;
+    gap: 16px;
+  }
+
+  .controls {
+    display: grid;
+    grid-template-columns: 2fr repeat(4, 1fr);
+    gap: 12px;
+  }
+
+  /* Narrower laptops — keep all 5 secondary tiles in one row but tighter. */
+  @media (max-width: 1280px) {
+    .secondary {
+      grid-template-columns: 1.3fr 1.5fr repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+  }
+
+  /* Tablet-ish — drop secondary to 3 cols, keep controls in one row. */
+  @media (max-width: 1080px) {
+    .secondary {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  /* Cramped windows — sub-meters wrap, controls go to 2 rows. */
+  @media (max-width: 820px) {
+    .sub-meters {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .secondary {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .controls {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .stat-rest { gap: 12px; }
+  }
+
+  /* Very narrow — single column stack. */
+  @media (max-width: 560px) {
+    .main { padding: 14px 14px; }
+    .panel { padding: 14px 14px 16px; }
+    .sub-meters,
+    .secondary,
+    .controls {
+      grid-template-columns: 1fr;
+    }
+    .statusbar {
+      flex-wrap: wrap;
+      height: auto;
+      padding: 10px;
+    }
+    .stat-rest {
+      width: 100%;
+      justify-content: space-between;
+      padding-right: 0;
+    }
   }
 </style>

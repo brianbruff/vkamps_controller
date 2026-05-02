@@ -64,6 +64,24 @@
     <line x1="3" y1="6" x2="3.01" y2="6" />
     <line x1="3" y1="12" x2="3.01" y2="12" />
     <line x1="3" y1="18" x2="3.01" y2="18" />
+  {:else if name === 'arrowDown'}
+    <path d="M12 4v14" />
+    <path d="M6 13l6 6 6-6" />
+  {:else if name === 'arrowUp'}
+    <path d="M12 20V6" />
+    <path d="M6 11l6-6 6 6" />
+  {:else if name === 'gauge'}
+    <path d="M3 14a9 9 0 1 1 18 0" />
+    <path d="M12 14l4-4" />
+    <circle cx="12" cy="14" r="1.5" fill="currentColor" stroke="none" />
+  {:else if name === 'moon'}
+    <path d="M20 14A8 8 0 1 1 10 4a7 7 0 0 0 10 10z" />
+  {:else if name === 'power'}
+    <path d="M12 4v8" />
+    <path d="M7.5 7.5a7 7 0 1 0 9 0" />
+  {:else if name === 'pause'}
+    <rect x="7"    y="5" width="3.5" height="14" rx="1" />
+    <rect x="13.5" y="5" width="3.5" height="14" rx="1" />
   {:else if name === 'plug'}
     <path d="M9 7V3" />
     <path d="M15 7V3" />

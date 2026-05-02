@@ -193,6 +193,8 @@
 
   .ip {
     width: 130px;
+    min-width: 0;
+    flex-shrink: 1;
     height: 22px;
     padding: 0 6px;
     border: 1px solid var(--color-border);
@@ -200,6 +202,10 @@
     background: var(--color-surface);
     color: var(--color-text-strong);
     font-size: 11px;
+  }
+  @media (max-width: 720px) {
+    .ip { width: 96px; }
+    .mode-label, .addr { display: none; }
   }
   .ip:focus {
     outline: none;
@@ -233,11 +239,11 @@
     border-color: var(--color-border-strong);
   }
   .btn.primary {
-    background: var(--color-accent-fill);
-    border-color: var(--color-accent);
-    color: var(--color-text-strong);
+    background: var(--brand);
+    border-color: var(--brand);
+    color: #ffffff;
   }
-  .btn.primary:hover:not(:disabled) { background: var(--color-accent-lo); }
+  .btn.primary:hover:not(:disabled) { background: var(--brand-2); border-color: var(--brand-2); }
   .btn.active {
     background: var(--color-bg-elevated);
     border-color: var(--color-accent-lo);

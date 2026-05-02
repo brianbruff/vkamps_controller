@@ -2,11 +2,14 @@
   import Icon from '../icons/Icon.svelte';
 
   /**
+   * Generic secondary tile. Used for simple readouts (e.g. Efficiency).
+   *
    * @type {{
    *   icon?: string,
    *   value: string | number,
    *   unit?: string,
    *   label: string,
+   *   sub?: string,
    *   mode?: 'readonly' | 'cycle' | 'toggle',
    *   active?: boolean,
    *   enabled?: boolean,
@@ -18,6 +21,7 @@
     value,
     unit = '',
     label,
+    sub = '',
     mode = 'readonly',
     active = false,
     enabled = true,
@@ -27,7 +31,7 @@
   const interactive = $derived(mode !== 'readonly' && enabled && typeof onactivate === 'function');
 </script>
 
-<button class="card"
+<button class="tile"
         type="button"
         data-mode={mode}
         class:active
@@ -36,76 +40,77 @@
         disabled={!interactive}
         onclick={interactive ? onactivate : undefined}>
 
-  <div class="top">
+  <div class="head">
+    <span class="l">{label}</span>
     {#if icon}
-      <Icon name={icon} size={14} stroke="var(--color-text-muted)" />
+      <span class="ico-pill"><Icon name={icon} size={18} /></span>
     {/if}
-    <span class="label">{label}</span>
   </div>
 
-  <div class="middle">
-    <span class="num val">{value}</span>
-    {#if unit}<span class="unit">{unit}</span>{/if}
-  </div>
-
-  {#if mode === 'cycle' && enabled}
-    <div class="chev"><Icon name="chevron" size={12} stroke="var(--color-text-faint)" /></div>
-  {/if}
+  <div class="v display">{value}{#if unit}<span class="u">{unit}</span>{/if}</div>
+  {#if sub}<div class="sub">{sub}</div>{/if}
 </button>
 
 <style>
-  .card {
-    position: relative;
+  .tile {
+    background: var(--paper);
+    border: 1px solid var(--hairline);
+    border-radius: 14px;
+    padding: 16px 18px;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    gap: 4px;
-    padding: 8px 10px;
-    background: var(--color-surface);
-    border: 1px solid var(--color-border);
-    border-radius: 6px;
-    color: var(--color-text);
+    gap: 8px;
     text-align: left;
-    height: 100%;
     cursor: default;
-    box-shadow: var(--shadow-card);
-    transition: background 100ms, border-color 100ms;
+    color: var(--ink-2);
+    transition: border-color 120ms, background 120ms;
+    height: 100%;
   }
-  .card.interactive { cursor: pointer; }
-  .card.interactive:hover {
-    background: var(--color-surface-hi);
-    border-color: var(--color-border-strong);
-  }
-  .card.disabled { opacity: 0.55; }
+  .tile.interactive { cursor: pointer; }
+  .tile.interactive:hover { border-color: var(--brand-2); }
+  .tile.disabled { opacity: 0.55; }
 
-  .card.active {
-    background: var(--color-accent-fill);
-    border-color: var(--color-accent);
-    color: var(--color-text-strong);
-  }
-
-  .top { display: flex; align-items: center; gap: 6px; }
-  .middle {
+  .head {
     display: flex;
-    align-items: baseline;
-    gap: 4px;
+    align-items: center;
+    justify-content: space-between;
   }
-  .val {
-    font-size: var(--fs-lg);
-    font-weight: 600;
-    color: var(--color-text-strong);
-    line-height: 1.1;
-  }
-  .unit {
-    font-size: var(--fs-xs);
-    color: var(--color-text-muted);
+  .l {
+    color: var(--ink-3);
+    font-size: 11px;
+    letter-spacing: 0.18em;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
+    font-weight: 600;
   }
-  .chev {
-    position: absolute;
-    right: 6px;
-    bottom: 6px;
-    opacity: 0.5;
+  .ico-pill {
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    background: var(--brand-3);
+    color: var(--brand);
+    display: grid; place-items: center;
+  }
+  .v {
+    font-weight: 700;
+    font-size: 28px;
+    color: var(--ink);
+    line-height: 1;
+  }
+  .v .u {
+    font-family: var(--font-ui);
+    font-size: 13px;
+    color: var(--ink-3);
+    margin-left: 4px;
+    font-weight: 500;
+  }
+  .sub {
+    font-family: var(--font-num);
+    font-size: 11px;
+    color: var(--ink-3);
+    font-weight: 500;
+  }
+
+  .tile.active {
+    background: var(--brand-3);
+    border-color: var(--brand);
   }
 </style>
