@@ -30,14 +30,14 @@ Every interactive surface in the renderer, what it does, the IPC channel it hits
 
 | Card | Type | Click behavior | Cmd | Wired? |
 |---|---|---|---|---|
-| **ANTENNA** | cycle | 1 → 2 → 3 → 4 → 1 | `31` / `32` / `33` / `34` | ✅ |
+| **ANTENNA** | cycle | 1 → 2 → 3 → 1 | `31` / `32` / `33` | ✅ |
 | **BAND** | cycle (only when CAT = Manual) | next of 160/80/40/30/20/17–15/12–10/6 | `71`…`78` | ✅ — gated on `settings.cat === 5` |
 | **SWR** | readonly | — | — | n/a |
 | **EFFICIENCY** | readonly | — | — | n/a |
 | **VOLTS** | toggle | flips between Normal / Volts+ | `41` / `42` | ✅ |
 | **TEMP** | readonly | — | — | n/a |
 
-> ⚠️ Known limitation: ANTENNA cycles raw 1→4 and does **not** consult the per-band antenna map in settings. Listed as a deferred TODO in the design.
+> ⚠️ Known limitation: ANTENNA cycles raw 1→3 and does **not** consult the per-band antenna map in settings. Listed as a deferred TODO in the design.
 
 ---
 
@@ -130,7 +130,7 @@ All subscribed in `App.svelte:onMount` and `DiagnosticsView`.
 ## 9. Issues / gaps worth noting
 
 1. **Sound alerts checkbox** is stored but no audio is hooked up.
-2. **Antenna cycling** ignores the per-band antenna map — always 1→4.
+2. **Antenna cycling** ignores the per-band antenna map — always 1→3.
 3. **`amp:getProtocol`** IPC is exposed in preload but no renderer code calls it. Dead weight, harmless.
 4. **`amp:sendCommand`** is fire-and-forget on the renderer side (no `await`). That's intentional — telemetry confirms state change — but it means a failed send (e.g., transport closed) doesn't surface to the user except via the diag log.
 5. **No-op cmds when not connected**: footer/pill/card clicks send commands even with no transport open; `transport.sendCommand` silently no-ops. Intentional but the user gets no feedback that the click "didn't take." A small improvement would be to disable interactive controls when `transportState.status !== 'open'`.

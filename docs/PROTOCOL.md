@@ -33,7 +33,7 @@ On exit: `→ send "99\n"` then close.
 "21"  bypass ON             "22"  bypass OFF
 "23"  reset/clear error
 "31"  antenna 1             "32"  antenna 2
-"33"  antenna 3             "34"  antenna 4
+"33"  antenna 3
 "41"  volts normal          "42"  volts+
 "44"  sleep/standby
 "45"  fan 100%              "46"  fan auto
