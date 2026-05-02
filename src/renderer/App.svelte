@@ -161,9 +161,9 @@
   async function cycleAntenna() { if (!connected || $isTransmitting) return; let next = (antenna % 3) + 1; await window.amp?.sendCommand(['31','32','33'][next-1]); }
   async function cycleBand() {
     if (!connected || $isTransmitting || $appConfig.cat !== 5) return;
-    let next = ($p6 || 0) >= 8 ? 1 : ($p6 || 0) + 1;
-    await window.amp?.sendCommand(['71','72','73','74','75','76','77','78'][next-1]);
-    const antIdx = $appConfig.antennaMap[next-1];
+    let next = ($p6 || 0) >= 7 ? 0 : ($p6 || 0) + 1;
+    await window.amp?.sendCommand(['71','72','73','74','75','76','77','78'][next]);
+    const antIdx = $appConfig.antennaMap[next];
     if (antIdx >= 1 && antIdx <= 3) await window.amp?.sendCommand(['31','32','33'][antIdx-1]);
   }
   async function toggleVolts() {
