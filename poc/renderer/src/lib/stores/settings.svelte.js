@@ -25,6 +25,8 @@ const DEFAULTS = {
   showFahrenheit: false,
   // POC-only: verbose RX logging (logs every received packet to diagnostics)
   verboseRxLogging: false,
+  // Peak hold duration in milliseconds (500-2500ms, default 2000ms)
+  peakHoldDuration: 2000,
 };
 
 export const settings = $state({ ...DEFAULTS });

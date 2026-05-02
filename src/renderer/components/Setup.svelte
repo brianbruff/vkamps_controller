@@ -191,6 +191,18 @@
           <label><input type="checkbox" bind:checked={cfg.sound} /> Sound Alerts</label>
           <label><input type="checkbox" bind:checked={cfg.inputIndicator} /> Input Indicator</label>
         </div>
+        <div class="range-field">
+          <label class="range-label">
+            Peak hold duration: {(cfg.peakHoldDuration / 1000).toFixed(1)}s
+          </label>
+          <input
+            type="range"
+            min="500"
+            max="2500"
+            step="100"
+            bind:value={cfg.peakHoldDuration}
+          />
+        </div>
       </fieldset>
 
       <!-- Import / Export -->
@@ -349,6 +361,21 @@
     align-items: center;
     gap: 6px;
     cursor: pointer;
+  }
+
+  .range-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 8px;
+  }
+  .range-label {
+    font-size: 11px;
+    color: #888;
+  }
+  .range-field input[type="range"] {
+    width: 100%;
+    accent-color: #39ff14;
   }
 
   .import-export {

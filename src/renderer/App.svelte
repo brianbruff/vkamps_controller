@@ -23,7 +23,6 @@
   let rpTimer = null;
   let crTimer = null;
   let inTimer = null;
-  const PEAK_DECAY_MS = 1500;
 
   // Computed display values
   let outputWatts = $derived.by(() => {
@@ -140,10 +139,11 @@
 
   function updatePeaks() {
     const raw1 = get(p1), raw2 = get(p2), raw4 = get(p4), raw12 = get(p12);
-    if (raw1 >= get(p1Peak)) { p1Peak.set(raw1); clearTimeout(opTimer); opTimer = setTimeout(() => p1Peak.set(0), PEAK_DECAY_MS); }
-    if (raw2 >= get(p2Peak)) { p2Peak.set(raw2); clearTimeout(rpTimer); rpTimer = setTimeout(() => p2Peak.set(0), PEAK_DECAY_MS); }
-    if (raw4 >= get(p4Peak)) { p4Peak.set(raw4); clearTimeout(crTimer); crTimer = setTimeout(() => p4Peak.set(0), PEAK_DECAY_MS); }
-    if ($appConfig.inputIndicator && raw12 >= get(p12Peak)) { p12Peak.set(raw12); clearTimeout(inTimer); inTimer = setTimeout(() => p12Peak.set(0), PEAK_DECAY_MS); }
+    const peakDecayMs = $appConfig.peakHoldDuration || 2000;
+    if (raw1 >= get(p1Peak)) { p1Peak.set(raw1); clearTimeout(opTimer); opTimer = setTimeout(() => p1Peak.set(0), peakDecayMs); }
+    if (raw2 >= get(p2Peak)) { p2Peak.set(raw2); clearTimeout(rpTimer); rpTimer = setTimeout(() => p2Peak.set(0), peakDecayMs); }
+    if (raw4 >= get(p4Peak)) { p4Peak.set(raw4); clearTimeout(crTimer); crTimer = setTimeout(() => p4Peak.set(0), peakDecayMs); }
+    if ($appConfig.inputIndicator && raw12 >= get(p12Peak)) { p12Peak.set(raw12); clearTimeout(inTimer); inTimer = setTimeout(() => p12Peak.set(0), peakDecayMs); }
   }
 
   function playAlert() { if ($appConfig.sound && alertAudio) alertAudio.play().catch(() => {}); }
