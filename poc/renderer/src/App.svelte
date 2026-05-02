@@ -262,7 +262,7 @@
       <div class="secondary">
         <AntennaTile
           active={deviceState.antenna}
-          ports={[1, 2, 3, 4]}
+          ports={[1, 2, 3]}
           showLabels={true}
           onselect={onAntennaSelect} />
 

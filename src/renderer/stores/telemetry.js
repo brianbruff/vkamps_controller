@@ -48,8 +48,8 @@ export const errorText = derived(p8, $p8 => ERROR_TEXTS[$p8] || 'Status OK');
 // Derived: fan mode
 export const fanMode = derived(p10, $p10 => $p10 === 1 ? '100%' : 'Auto');
 
-// Band names
-const BAND_NAMES = ['', '160', '80', '40', '30', '20', '17-15', '12-10', '6'];
+// Band names (0-indexed: p6 values 0-7)
+const BAND_NAMES = ['160', '80', '40', '30', '20', '17-15', '12-10', '6'];
 export const bandName = derived(p6, $p6 => BAND_NAMES[$p6] || '');
 
 // Apply incoming TCP packet

@@ -1,7 +1,7 @@
 <script>
   import AntennaIcon from '../graphics/AntennaIcon.svelte';
 
-  const KIND_BY_INDEX = { 1: 'doublet', 2: 'dipole', 3: 'yagi', 4: 'yagi' };
+  const KIND_BY_INDEX = { 1: 'doublet', 2: 'dipole', 3: 'yagi' };
 
   /**
    * @type {{
@@ -14,10 +14,10 @@
    */
   let {
     active,
-    labels = { 1: 'Doublet', 2: 'Dipole', 3: '11-el Yagi', 4: 'Aux' },
+    labels = { 1: 'Doublet', 2: 'Dipole', 3: '11-el Yagi' },
     showLabels = true,
     onselect,
-    ports = [1, 2, 3, 4],
+    ports = [1, 2, 3],
   } = $props();
 </script>
 

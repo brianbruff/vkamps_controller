@@ -23,7 +23,6 @@
   let rpTimer = null;
   let crTimer = null;
   let inTimer = null;
-  const PEAK_DECAY_MS = 1500;
 
   // Computed display values
   let outputWatts = $derived.by(() => {
@@ -140,10 +139,11 @@
 
   function updatePeaks() {
     const raw1 = get(p1), raw2 = get(p2), raw4 = get(p4), raw12 = get(p12);
-    if (raw1 >= get(p1Peak)) { p1Peak.set(raw1); clearTimeout(opTimer); opTimer = setTimeout(() => p1Peak.set(0), PEAK_DECAY_MS); }
-    if (raw2 >= get(p2Peak)) { p2Peak.set(raw2); clearTimeout(rpTimer); rpTimer = setTimeout(() => p2Peak.set(0), PEAK_DECAY_MS); }
-    if (raw4 >= get(p4Peak)) { p4Peak.set(raw4); clearTimeout(crTimer); crTimer = setTimeout(() => p4Peak.set(0), PEAK_DECAY_MS); }
-    if ($appConfig.inputIndicator && raw12 >= get(p12Peak)) { p12Peak.set(raw12); clearTimeout(inTimer); inTimer = setTimeout(() => p12Peak.set(0), PEAK_DECAY_MS); }
+    const peakDecayMs = $appConfig.peakHoldDuration || 2000;
+    if (raw1 >= get(p1Peak)) { p1Peak.set(raw1); clearTimeout(opTimer); opTimer = setTimeout(() => p1Peak.set(0), peakDecayMs); }
+    if (raw2 >= get(p2Peak)) { p2Peak.set(raw2); clearTimeout(rpTimer); rpTimer = setTimeout(() => p2Peak.set(0), peakDecayMs); }
+    if (raw4 >= get(p4Peak)) { p4Peak.set(raw4); clearTimeout(crTimer); crTimer = setTimeout(() => p4Peak.set(0), peakDecayMs); }
+    if ($appConfig.inputIndicator && raw12 >= get(p12Peak)) { p12Peak.set(raw12); clearTimeout(inTimer); inTimer = setTimeout(() => p12Peak.set(0), peakDecayMs); }
   }
 
   function playAlert() { if ($appConfig.sound && alertAudio) alertAudio.play().catch(() => {}); }
@@ -161,9 +161,9 @@
   async function cycleAntenna() { if (!connected || $isTransmitting) return; let next = (antenna % 3) + 1; await window.amp?.sendCommand(['31','32','33'][next-1]); }
   async function cycleBand() {
     if (!connected || $isTransmitting || $appConfig.cat !== 5) return;
-    let next = ($p6 || 0) >= 8 ? 1 : ($p6 || 0) + 1;
-    await window.amp?.sendCommand(['71','72','73','74','75','76','77','78'][next-1]);
-    const antIdx = $appConfig.antennaMap[next-1];
+    let next = ($p6 || 0) >= 7 ? 0 : ($p6 || 0) + 1;
+    await window.amp?.sendCommand(['71','72','73','74','75','76','77','78'][next]);
+    const antIdx = $appConfig.antennaMap[next];
     if (antIdx >= 1 && antIdx <= 3) await window.amp?.sendCommand(['31','32','33'][antIdx-1]);
   }
   async function toggleVolts() {

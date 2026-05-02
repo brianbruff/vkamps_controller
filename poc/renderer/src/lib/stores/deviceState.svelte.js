@@ -1,7 +1,7 @@
 // Mirror of device-side state derived from incoming 8-field packets + local toggles.
 export const deviceState = $state({
   band: 3,         // 0..7 — 30m default
-  antenna: 1,      // 1..4
+  antenna: 1,      // 1..3
   bypass: false,
   voltsPlus: false,
   fanFull: false,

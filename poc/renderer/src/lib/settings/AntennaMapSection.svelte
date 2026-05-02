@@ -6,12 +6,12 @@
 </script>
 
 <section class="sect">
-  <div class="hd label">Antenna Map <span class="hint">(per band, 1–4)</span></div>
+  <div class="hd label">Antenna Map <span class="hint">(per band, 1–3)</span></div>
   <div class="grid">
     {#each labels as bnd, i}
       <label class="cell">
         <span class="label">{bnd}</span>
-        <input type="number" min="1" max="4" step="1" bind:value={draft.antennaMap[i]} />
+        <input type="number" min="1" max="3" step="1" bind:value={draft.antennaMap[i]} />
       </label>
     {/each}
   </div>

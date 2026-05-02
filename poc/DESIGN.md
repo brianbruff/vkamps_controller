@@ -213,7 +213,7 @@ Whole window is a vertical CSS grid. The tester ribbon sits outside the main gri
 | Status pill 1     | Connection / error: `p9`, `p8`                    | TCP / serial-8 |
 | Status pill 2     | TX / ByPass: `p11` (1=bypassed) + derived TX flag | TCP / serial-8 |
 | Status pill 3     | Fan mode (local toggle, last-sent 45/46)          | local state  |
-| Stat card ANT     | Antenna `p7` (1–4)                                | TCP / serial-8 |
+| Stat card ANT     | Antenna `p7` (1–3)                                | TCP / serial-8 |
 | Stat card BAND    | Band index `p6` → label                           | TCP / serial-8 |
 | Stat card SWR     | Derived: `(p1+p2)/(p1−p2)` clamped ≥1.0, capped 9.99 (matches original `calcSWR`) | derived |
 | Stat card EFF     | Efficiency formula (PRD 7.4) per koef             | derived      |
@@ -324,7 +324,6 @@ Every protocol command in PROTOCOL.md has a designated UI trigger. Commands mark
 | `31`    | Antenna 1                       | ANT stat card — cycle to position 1.                                      |
 | `32`    | Antenna 2                       | ANT stat card — cycle to position 2.                                      |
 | `33`    | Antenna 3                       | ANT stat card — cycle to position 3.                                      |
-| `34`    | Antenna 4                       | ANT stat card — cycle to position 4 (only if antenna map allows).         |
 | `41`    | Volts normal                    | VOLTS stat card click when state is Volts+.                               |
 | `42`    | Volts+                          | VOLTS stat card click when state is Normal.                               |
 | `44`    | Sleep / standby                 | Footer Sleep button.                                                      |
@@ -368,7 +367,7 @@ export type EightField = {
   p3: number;           // temperature raw
   p5: number;           // voltage * 10
   p6: number;           // band index 0..7
-  p7: number;           // antenna 1..4
+  p7: number;           // antenna 1..3
   p8: 0 | 1 | 2 | 3;    // error code
   p9: number;           // device status, 0 = OK
   p10: number;          // reserved

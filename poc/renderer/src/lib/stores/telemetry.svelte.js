@@ -14,8 +14,6 @@ export const telemetry = $state({
   peakDecayAt: 0,
 });
 
-const PEAK_HOLD_MS = 1500;
-
 export function applyMeterPacket(d) {
   telemetry.p1 = d.p1 ?? 0;
   telemetry.p2 = d.p2 ?? 0;
@@ -23,9 +21,10 @@ export function applyMeterPacket(d) {
   telemetry.p12 = d.p12 ?? 0;
 
   const now = performance.now();
+  const peakHoldMs = settings.peakHoldDuration || 2000;
   if (telemetry.p1 >= telemetry.peakP1) {
     telemetry.peakP1 = telemetry.p1;
-    telemetry.peakDecayAt = now + PEAK_HOLD_MS;
+    telemetry.peakDecayAt = now + peakHoldMs;
   } else if (now > telemetry.peakDecayAt) {
     telemetry.peakP1 = Math.max(telemetry.p1, telemetry.peakP1 * 0.985);
   }

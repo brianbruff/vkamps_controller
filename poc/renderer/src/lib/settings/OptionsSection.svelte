@@ -27,6 +27,18 @@
       <span>Verbose RX logging</span>
     </label>
   </div>
+  <div class="range-field">
+    <label class="range-label">
+      <span>Peak hold duration: {(draft.peakHoldDuration / 1000).toFixed(1)}s</span>
+    </label>
+    <input
+      type="range"
+      min="500"
+      max="2500"
+      step="100"
+      bind:value={draft.peakHoldDuration}
+    />
+  </div>
 </section>
 
 <style>
@@ -39,4 +51,17 @@
   }
   .check { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; color: var(--color-text); }
   .check input { accent-color: var(--color-accent); }
+  .range-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .range-label {
+    font-size: 12px;
+    color: var(--color-text);
+  }
+  .range-field input[type="range"] {
+    width: 100%;
+    accent-color: var(--color-accent);
+  }
 </style>
