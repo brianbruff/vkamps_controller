@@ -27,6 +27,8 @@ const DEFAULTS = {
   verboseRxLogging: false,
   // Peak hold duration in milliseconds (500-2500ms, default 2000ms)
   peakHoldDuration: 2000,
+  // 'full' = 5-tile panel; 'compact' = stripped-down kiosk view
+  viewMode: 'full',
 };
 
 export const settings = $state({ ...DEFAULTS });

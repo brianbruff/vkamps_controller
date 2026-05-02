@@ -9,12 +9,13 @@
   import BandTile from './lib/cards/BandTile.svelte';
   import SwrTile from './lib/cards/SwrTile.svelte';
   import PowerThermalTile from './lib/cards/PowerThermalTile.svelte';
+  import CompactPanel from './lib/cards/CompactPanel.svelte';
   import ControlButton from './lib/controls/ControlButton.svelte';
   import OperateToggle from './lib/controls/OperateToggle.svelte';
   import SettingsModal from './lib/settings/SettingsModal.svelte';
   import DiagnosticsView from './lib/diagnostics/DiagnosticsView.svelte';
 
-  import { settings, loadSettings } from './lib/stores/settings.svelte.js';
+  import { settings, loadSettings, saveSettings } from './lib/stores/settings.svelte.js';
   import { transportState, setStatus, setError } from './lib/stores/transport.svelte.js';
   import { deviceState, applyStatePacket } from './lib/stores/deviceState.svelte.js';
   import {
@@ -191,6 +192,19 @@
     send(String(30 + n));
     deviceState.antenna = n;
   }
+  // Compact view uses one button that cycles through the antenna ports.
+  const ANTENNA_PORTS = [1, 2, 3];
+  function onAntennaCycle() {
+    const i = ANTENNA_PORTS.indexOf(deviceState.antenna || 1);
+    const next = ANTENNA_PORTS[(i + 1) % ANTENNA_PORTS.length];
+    onAntennaSelect(next);
+  }
+
+  function onViewModeChange(next) {
+    if (next !== 'full' && next !== 'compact') return;
+    if (settings.viewMode === next) return;
+    saveSettings({ viewMode: next });
+  }
 
   const catManual = $derived(settings.cat === 5);
   // Active display-button index derived from the firmware band index.
@@ -229,10 +243,36 @@
 <div class="fit-to-screen">
 <div class="app-shell">
   <HeaderBar
+    viewMode={settings.viewMode}
+    onviewmode={onViewModeChange}
     onneedsetup={onNeedSetup}
     ondiagnostics={onDiagnostics} />
 
   <main class="main">
+    {#if settings.viewMode === 'compact'}
+      <div class="panel compact-panel">
+        <CompactPanel
+          outW={outW}
+          outMax={outputScale.max}
+          outTicks={outputScale.ticks}
+          swr={swrVal}
+          bandLabels={BAND_LABELS}
+          bandActive={activeBandButton}
+          bandFreq={BAND_BUTTONS[activeBandButton]?.freq || ''}
+          bandEnabled={catManual}
+          onbandselect={onBandSelect}
+          antenna={deviceState.antenna || 1}
+          antennaPorts={ANTENNA_PORTS}
+          onantennacycle={onAntennaCycle}
+          fanFull={deviceState.fanFull}
+          onfan={onFanPill}
+          operate={operating}
+          onoperate={onOperateChange}
+          bypass={deviceState.bypass}
+          onbypass={onBypass}
+          txActive={deviceState.txActive} />
+      </div>
+    {:else}
     <div class="panel">
       <!-- Hero output meter -->
       <OutputMeter
@@ -335,6 +375,7 @@
         <ControlButton icon="setup"  label="Setup"  kind="modal" onclick={onSetup} />
       </div>
     </div>
+    {/if}
   </main>
 
   <SettingsModal bind:open={settingsOpen} onclose={() => settingsOpen = false} />
@@ -403,6 +444,18 @@
     flex: 1 1 auto;
     min-height: 0;
     overflow: hidden;
+  }
+
+  /* Compact view drives its own internal grid — opt out of the 5-row
+     panel template and let CompactPanel fill the panel box. */
+  .panel.compact-panel {
+    display: flex;
+    flex-direction: column;
+    padding: 16px;
+  }
+  .panel.compact-panel > :global(*) {
+    flex: 1 1 auto;
+    min-height: 0;
   }
 
   .sub-meters {

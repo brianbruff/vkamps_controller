@@ -1,5 +1,6 @@
 <script>
   import ConnectControl from './ConnectControl.svelte';
+  import ViewModeToggle from './ViewModeToggle.svelte';
   import Icon from '../icons/Icon.svelte';
   import vkLogo from '../../assets/vk_logo.jpeg';
 
@@ -7,15 +8,18 @@
    * @type {{
    *   onneedsetup?: () => void,
    *   ondiagnostics?: () => void,
+   *   viewMode?: 'full' | 'compact',
+   *   onviewmode?: (next: 'full' | 'compact') => void,
    * }}
    */
-  let { onneedsetup, ondiagnostics } = $props();
+  let { onneedsetup, ondiagnostics, viewMode = 'full', onviewmode } = $props();
 </script>
 
 <header class="header" aria-label="VK Amps">
   <img src={vkLogo} alt="VK Amps" class="logo" />
 
   <div class="right">
+    <ViewModeToggle value={viewMode} onchange={onviewmode} />
     <button class="diag-btn" type="button" aria-label="Diagnostics" title="Diagnostics" onclick={() => ondiagnostics?.()}>
       <Icon name="log" size={14} />
       <span class="diag-label">DIAG</span>
