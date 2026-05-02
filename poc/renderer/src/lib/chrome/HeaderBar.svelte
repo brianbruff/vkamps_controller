@@ -18,8 +18,11 @@
 <header class="header" aria-label="VK Amps">
   <img src={vkLogo} alt="VK Amps" class="logo" />
 
-  <div class="right">
+  <div class="tabs">
     <ViewModeToggle value={viewMode} onchange={onviewmode} />
+  </div>
+
+  <div class="right">
     <button class="diag-btn" type="button" aria-label="Diagnostics" title="Diagnostics" onclick={() => ondiagnostics?.()}>
       <Icon name="log" size={14} />
       <span class="diag-label">DIAG</span>
@@ -35,13 +38,26 @@
     position: relative;
     height: 64px;
     display: flex;
-    align-items: center;
-    justify-content: flex-end;
+    align-items: stretch;
     padding: 0 24px;
     background-color: #1d1740;
-    border-bottom: 1px solid #00000033;
     flex: 0 0 auto;
     overflow: hidden;
+  }
+
+  /* Tab strip — sits flush with the bottom of the header so active tab
+     visually connects to the panel below. */
+  .tabs {
+    margin-left: 220px;        /* clear the logo */
+    margin-right: auto;        /* push right group to the right */
+    align-self: flex-end;
+    display: flex;
+    align-items: flex-end;
+  }
+
+  /* The right cluster keeps its centered alignment. */
+  .right {
+    align-self: center;
   }
 
   /* Logo pinned to the left, fading out toward the right. */
@@ -65,6 +81,7 @@
     display: flex;
     align-items: center;
     gap: 10px;
+    align-self: center;
   }
 
   .diag-btn {

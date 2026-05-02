@@ -31,31 +31,46 @@
 </div>
 
 <style>
+  /* Classic browser-style tabs that sit at the bottom of the header and
+     visually attach to the panel below. The active tab uses the panel's
+     paper colour so it reads as one continuous surface. */
   .vmt {
     display: inline-flex;
-    height: 28px;
-    padding: 2px;
-    border-radius: 999px;
-    border: 1px solid rgba(255, 255, 255, 0.35);
-    background: rgba(255, 255, 255, 0.08);
-    backdrop-filter: blur(4px);
+    align-items: flex-end;
+    gap: 4px;
+    position: relative;
+    /* Drop the tab 1px below the header bottom so the active tab's
+       bottom edge sits underneath the panel border. */
+    margin-bottom: -1px;
   }
   .seg {
-    border: 0;
-    background: transparent;
-    color: rgba(244, 243, 255, 0.7);
+    height: 34px;
+    padding: 0 22px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-bottom: none;
+    border-radius: 12px 12px 0 0;
+    background: rgba(255, 255, 255, 0.05);
+    color: rgba(244, 243, 255, 0.65);
     font-family: var(--font-ui);
     font-size: 11px;
     font-weight: 600;
-    letter-spacing: 0.14em;
-    padding: 0 14px;
-    border-radius: 999px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
     cursor: pointer;
-    transition: background 120ms, color 120ms;
+    transition: background 120ms, color 120ms, border-color 120ms;
   }
-  .seg:hover:not(.active) { color: #ffffff; }
+  .seg:hover:not(.active) {
+    background: rgba(255, 255, 255, 0.12);
+    color: #ffffff;
+    border-color: rgba(255, 255, 255, 0.35);
+  }
   .seg.active {
-    background: #ffffff;
-    color: #1d1740;
+    background: var(--paper);
+    color: var(--ink-2);
+    border-color: var(--hairline);
+    /* Slightly taller so the white tongue clearly extends down toward
+       the panel below. */
+    height: 38px;
+    z-index: 2;
   }
 </style>

@@ -416,7 +416,9 @@
   }
 
   .main {
-    padding: 16px 18px;
+    /* No top padding — the panel butts up against the header so the active
+       view-mode tab (white) merges seamlessly with the panel below. */
+    padding: 0 18px 16px;
     display: flex;
     flex-direction: column;
     min-height: 0;
@@ -430,7 +432,8 @@
   .panel {
     background: var(--paper);
     border: 1px solid var(--hairline);
-    border-radius: 14px;
+    border-top: none;             /* the tabs above own this edge */
+    border-radius: 0 0 14px 14px; /* rounded only at the bottom */
     box-shadow: var(--shadow-panel);
     padding: 14px 14px;
     display: grid;
