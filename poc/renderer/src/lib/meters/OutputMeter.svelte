@@ -85,12 +85,32 @@
     border: 1px solid var(--hairline);
     border-radius: 14px;
     padding: 20px 24px;
+    height: 100%;
   }
   .hero {
     display: grid;
-    grid-template-columns: minmax(220px, 320px) 1fr;
+    /* Arc occupies ~28% of the row width; lets the gauge grow on big screens. */
+    grid-template-columns: minmax(220px, 28%) minmax(0, 1fr);
     gap: 24px;
     align-items: stretch;
+    height: 100%;
+  }
+  /* Stack the arc above the bar/stats when the panel gets narrow. */
+  @media (max-width: 760px) {
+    .hero {
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+    .arc-wrap {
+      max-width: 320px;
+      margin: 0 auto;
+      width: 100%;
+    }
+  }
+  @media (max-width: 460px) {
+    .stats {
+      grid-template-columns: 1fr;
+    }
   }
 
   .arc-wrap {
@@ -107,7 +127,7 @@
   .num-display {
     font-family: var(--font-display);
     font-weight: 700;
-    font-size: var(--fs-hero);
+    font-size: clamp(var(--fs-hero), 6vw, 96px);
     color: var(--ink);
     line-height: 1;
     font-variant-numeric: tabular-nums;
@@ -169,8 +189,8 @@
 
   .bar-track {
     position: relative;
-    height: 18px;
-    border-radius: 9px;
+    height: clamp(18px, 3vh, 36px);
+    border-radius: 999px;
     background: var(--paper-2);
     border: 1px solid var(--hairline);
     overflow: hidden;
@@ -201,14 +221,14 @@
 
   .stats {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 12px;
   }
   .s {
     background: var(--paper-2);
     border: 1px solid var(--hairline-2);
     border-radius: 10px;
-    padding: 10px 14px;
+    padding: clamp(10px, 1.6vh, 18px) clamp(14px, 1.8vw, 22px);
   }
   .s .l {
     font-size: 10px;
@@ -219,7 +239,7 @@
   }
   .s .v {
     font-weight: 600;
-    font-size: 22px;
+    font-size: clamp(22px, 3.2vh, 36px);
     color: var(--ink);
     margin-top: 4px;
     line-height: 1;

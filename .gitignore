@@ -12,3 +12,7 @@ poc/node_modules/
 poc/renderer/dist/
 poc/dist-electron/
 .claude/
+
+# Override global ignore of `lib/` for the Svelte renderer source.
+!poc/renderer/src/lib/
+!poc/renderer/src/lib/**

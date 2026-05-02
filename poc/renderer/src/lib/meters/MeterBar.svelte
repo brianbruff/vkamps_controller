@@ -141,7 +141,7 @@
 
   .val {
     font-weight: 700;
-    font-size: 32px;
+    font-size: clamp(32px, 4.4vh, 56px);
     color: var(--ink);
     line-height: 1;
     white-space: nowrap;
@@ -157,8 +157,10 @@
 
   .mb {
     position: relative;
-    height: 10px;
-    border-radius: 5px;
+    flex: 1 1 auto;
+    min-height: 12px;
+    max-height: 64px;
+    border-radius: 999px;
     background: var(--paper-2);
     border: 1px solid var(--hairline-2);
     overflow: hidden;
@@ -167,7 +169,7 @@
     position: absolute;
     left: 0; top: 0; bottom: 0;
     background: var(--brand);
-    border-radius: 4px;
+    border-radius: inherit;
     transition: width 200ms cubic-bezier(.4,0,.2,1);
   }
   .mb.warn i   { background: var(--warn); }

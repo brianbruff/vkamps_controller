@@ -314,6 +314,9 @@
   .main {
     padding: 24px 28px;
     overflow: auto;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
   }
 
   .panel {
@@ -323,14 +326,24 @@
     box-shadow: var(--shadow-panel);
     padding: 20px 22px 24px;
     display: grid;
+    /* Hero, sub-meters, and secondary tiles all absorb extra vertical space;
+       status bar and controls stay at their natural height. */
+    grid-template-rows:
+      minmax(180px, 1.4fr)   /* hero output meter */
+      minmax(160px, 1fr)     /* reflected / input / current */
+      auto                    /* status bar */
+      minmax(180px, 1.3fr)   /* antenna / band / swr / volts / temp */
+      auto;                   /* controls */
     gap: 16px;
-    max-width: 1320px;
+    width: 100%;
     margin: 0 auto;
+    flex: 1 1 auto;
+    min-height: 0;
   }
 
   .sub-meters {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 16px;
   }
 
@@ -379,12 +392,53 @@
     gap: 12px;
   }
 
-  @media (max-width: 1100px) {
+  /* Narrower laptops — keep all 5 secondary tiles in one row but tighter. */
+  @media (max-width: 1280px) {
     .secondary {
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: 1.3fr 1.5fr repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+  }
+
+  /* Tablet-ish — drop secondary to 3 cols, keep controls in one row. */
+  @media (max-width: 1080px) {
+    .secondary {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  /* Cramped windows — sub-meters wrap, controls go to 2 rows. */
+  @media (max-width: 820px) {
+    .sub-meters {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .secondary {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
     .controls {
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .stat-rest { gap: 12px; }
+  }
+
+  /* Very narrow — single column stack. */
+  @media (max-width: 560px) {
+    .main { padding: 14px 14px; }
+    .panel { padding: 14px 14px 16px; }
+    .sub-meters,
+    .secondary,
+    .controls {
+      grid-template-columns: 1fr;
+    }
+    .statusbar {
+      flex-wrap: wrap;
+      height: auto;
+      padding: 10px;
+    }
+    .stat-rest {
+      width: 100%;
+      justify-content: space-between;
+      padding-right: 0;
     }
   }
 </style>

@@ -193,6 +193,8 @@
 
   .ip {
     width: 130px;
+    min-width: 0;
+    flex-shrink: 1;
     height: 22px;
     padding: 0 6px;
     border: 1px solid var(--color-border);
@@ -200,6 +202,10 @@
     background: var(--color-surface);
     color: var(--color-text-strong);
     font-size: 11px;
+  }
+  @media (max-width: 720px) {
+    .ip { width: 96px; }
+    .mode-label, .addr { display: none; }
   }
   .ip:focus {
     outline: none;
