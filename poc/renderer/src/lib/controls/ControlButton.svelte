@@ -2,6 +2,9 @@
   import Icon from '../icons/Icon.svelte';
 
   /**
+   * Ghost-style control button: white background, hairline border, indigo on
+   * hover/active. Active toggles use a soft brand-tint instead of a hard fill.
+   *
    * @type {{
    *   icon?: string,
    *   label: string,
@@ -23,54 +26,52 @@
         {disabled}
         onclick={onclick}>
   {#if icon}
-    <Icon name={icon} size={16} stroke={active ? 'var(--color-text-strong)' : 'currentColor'} />
+    <Icon name={icon} size={16} stroke="currentColor" />
   {/if}
   <span class="text">{label}</span>
 </button>
 
 <style>
   .ctrl {
+    background: var(--paper);
+    border: 1px solid var(--hairline);
+    border-radius: 12px;
+    padding: 12px 14px;
+    color: var(--ink-2);
+    font-family: var(--font-ui);
+    font-weight: 600;
+    font-size: 14px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: 10px;
+    cursor: pointer;
     width: 100%;
     height: 100%;
-    padding: 0 14px;
-    border: 1px solid var(--color-border);
-    background: transparent;
-    color: var(--color-text);
-    border-radius: 6px;
-    font-size: var(--fs-base);
-    font-weight: 500;
-    letter-spacing: 0.04em;
-    transition: background 100ms, border-color 100ms, color 100ms;
-    box-shadow: var(--shadow-card);
+    transition: border-color 120ms, color 120ms, background 120ms;
   }
   .ctrl:hover:not([disabled]) {
-    background: var(--color-surface-hi);
-    border-color: var(--color-border-strong);
-  }
-  .ctrl:active:not([disabled]) {
-    background: var(--color-accent-fill);
+    border-color: var(--brand-2);
+    color: var(--brand);
+    background: #fafbff;
   }
   .ctrl[disabled] { opacity: 0.5; cursor: not-allowed; }
 
   .ctrl.active {
-    background: var(--color-accent-fill);
-    border-color: var(--color-accent);
-    color: var(--color-text-strong);
+    background: var(--brand-3);
+    border-color: var(--brand);
+    color: var(--brand);
   }
 
   .ctrl[data-tone="warn"].active {
-    background: #4a3a14;
-    border-color: var(--color-warn);
-    color: var(--color-warn);
+    background: var(--warn-tint);
+    border-color: var(--warn-edge);
+    color: var(--warn);
   }
   .ctrl[data-tone="danger"].active {
-    background: #5a1614;
-    border-color: var(--color-tx);
-    color: #ffd6d4;
+    background: var(--danger-tint);
+    border-color: var(--danger-edge);
+    color: var(--danger);
   }
 
   .text { white-space: nowrap; }

@@ -1,5 +1,11 @@
 <script>
+  import Icon from '../icons/Icon.svelte';
+  import WaveSpark from '../graphics/WaveSpark.svelte';
+
   /**
+   * Mini meter card. Shows: icon-pill + label + sub line, large value,
+   * thin progress bar (with warn/danger tint), footer scale (0/mid/max).
+   *
    * @type {{
    *   label: string,
    *   value: number,
@@ -8,7 +14,12 @@
    *   peakHold?: number,
    *   ticks?: number[],
    *   overThreshold?: number,
+   *   warnThreshold?: number,
    *   compact?: boolean,
+   *   icon?: string,
+   *   sub?: string,
+   *   spark?: number | null,
+   *   decimals?: number,
    * }}
    */
   let {
@@ -18,112 +29,162 @@
     unit = '',
     peakHold = 0,
     ticks = null,
-    overThreshold = 0.9,
+    overThreshold = 0.95,
+    warnThreshold = 0.8,
     compact = false,
+    icon = '',
+    sub = '',
+    spark = null,
+    decimals = 0,
   } = $props();
 
   const pct = $derived(Math.max(0, Math.min(100, (value / max) * 100)));
   const peakPct = $derived(peakHold ? Math.max(0, Math.min(100, (peakHold / max) * 100)) : 0);
-  const over = $derived(pct >= overThreshold * 100);
+  const tone = $derived(pct >= overThreshold * 100 ? 'danger' : pct >= warnThreshold * 100 ? 'warn' : '');
 
-  const displayValue = $derived(Math.round(value));
+  const displayValue = $derived(decimals > 0 ? value.toFixed(decimals) : Math.round(value));
+  const footTicks = $derived(ticks && ticks.length ? [0, ticks[Math.floor(ticks.length / 2)] ?? max / 2, max] : [0, Math.round(max / 2), max]);
 </script>
 
-<div class="meter-bar" class:compact>
-  <div class="row top">
-    <span class="label">{label}</span>
-    <div class="value">
-      <span class="num val">{displayValue}</span>
-      {#if unit}<span class="unit">{unit}</span>{/if}
+<div class="meter card" class:compact>
+  <div class="head">
+    <div class="titlerow">
+      {#if icon}
+        <div class="ico-wrap">
+          <Icon name={icon} size={18} stroke="currentColor" />
+        </div>
+      {/if}
+      <div class="meta">
+        <div class="card-label">{label}</div>
+        {#if sub}
+          <div class="sub">{sub}</div>
+        {:else if spark != null}
+          <div class="sub-spark">
+            <WaveSpark amplitude={spark} />
+          </div>
+        {/if}
+      </div>
     </div>
+    <div class="val display">{displayValue}{#if unit}<span class="u">{unit}</span>{/if}</div>
   </div>
 
-  <div class="track">
-    <div class="fill" class:over style="width: {pct}%;"></div>
+  <div class="mb {tone}">
+    <i style="width: {pct}%"></i>
     {#if peakPct > 0 && peakPct > pct}
-      <div class="peak" style="left: {peakPct}%;"></div>
+      <em class="peak" style="left: {peakPct}%"></em>
     {/if}
   </div>
 
-  {#if ticks && ticks.length}
-    <div class="ticks num">
-      <span>0</span>
-      {#each ticks as t}
-        <span>{t}</span>
-      {/each}
-    </div>
-  {/if}
+  <div class="mb-foot num">
+    {#each footTicks as t, i}
+      <span>{t}{i === footTicks.length - 1 && unit ? ' ' + unit : ''}</span>
+    {/each}
+  </div>
 </div>
 
 <style>
-  .meter-bar {
+  .card {
+    background: var(--paper);
+    border: 1px solid var(--hairline);
+    border-radius: 14px;
+    padding: 16px 18px;
     display: flex;
     flex-direction: column;
-    gap: 6px;
-    padding: 8px 10px 6px;
-    background: var(--color-surface);
-    border: 1px solid var(--color-border);
-    border-radius: 6px;
-    box-shadow: var(--shadow-card);
+    gap: 12px;
     height: 100%;
   }
-  .meter-bar.compact { padding: 6px 8px 4px; gap: 4px; }
+  .meter.compact { padding: 12px 14px; gap: 8px; }
 
-  .row.top {
+  .head {
     display: flex;
+    align-items: flex-start;
     justify-content: space-between;
-    align-items: baseline;
+    gap: 12px;
   }
-  .value { display: flex; align-items: baseline; gap: 4px; }
-  .val {
-    font-size: var(--fs-xl);
-    font-weight: 600;
-    color: var(--color-text-strong);
-    line-height: 1;
+  .titlerow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
   }
-  .compact .val { font-size: var(--fs-lg); }
-  .unit {
-    font-size: var(--fs-sm);
-    color: var(--color-text-muted);
+  .ico-wrap {
+    width: 34px; height: 34px;
+    border-radius: 9px;
+    background: var(--brand-3);
+    color: var(--brand);
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+  }
+  .meta { min-width: 0; }
+  .card-label {
+    font-size: 11px;
+    color: var(--ink-3);
+    letter-spacing: 0.18em;
     text-transform: uppercase;
-    letter-spacing: 0.06em;
+    font-weight: 600;
+  }
+  .sub {
+    font-family: var(--font-num);
+    font-size: 11px;
+    color: var(--ink-3);
+    margin-top: 2px;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .sub-spark {
+    margin-top: 4px;
+    width: 110px;
   }
 
-  .track {
+  .val {
+    font-weight: 700;
+    font-size: 32px;
+    color: var(--ink);
+    line-height: 1;
+    white-space: nowrap;
+  }
+  .compact .val { font-size: 24px; }
+  .val .u {
+    font-family: var(--font-ui);
+    font-size: 13px;
+    color: var(--ink-3);
+    margin-left: 4px;
+    font-weight: 500;
+  }
+
+  .mb {
     position: relative;
-    height: 12px;
-    background: var(--gauge-track);
-    border: 1px solid var(--color-border);
-    border-radius: 3px;
+    height: 10px;
+    border-radius: 5px;
+    background: var(--paper-2);
+    border: 1px solid var(--hairline-2);
     overflow: hidden;
   }
-  .compact .track { height: 9px; }
-  .fill {
+  .mb i {
     position: absolute;
-    inset: 0 auto 0 0;
-    background: linear-gradient(180deg, var(--color-accent-hi) 0%, var(--gauge-fill) 60%, var(--color-accent-lo) 100%);
-    transition: width 80ms linear;
-    box-shadow: inset 0 0 6px var(--color-accent-glow);
+    left: 0; top: 0; bottom: 0;
+    background: var(--brand);
+    border-radius: 4px;
+    transition: width 200ms cubic-bezier(.4,0,.2,1);
   }
-  .fill.over {
-    background: linear-gradient(180deg, #ff8a87 0%, var(--gauge-fill-over) 60%, #b8302d 100%);
-    box-shadow: inset 0 0 6px #ff4d4a55;
-  }
-  .peak {
+  .mb.warn i   { background: var(--warn); }
+  .mb.danger i { background: var(--danger); }
+  .mb .peak {
     position: absolute;
-    top: -1px;
-    bottom: -1px;
+    top: -1px; bottom: -1px;
     width: 2px;
-    background: var(--gauge-peak);
-    box-shadow: 0 0 4px #ffffff80;
+    background: var(--ink);
     transform: translateX(-1px);
   }
 
-  .ticks {
+  .mb-foot {
     display: flex;
     justify-content: space-between;
-    font-size: var(--fs-xs);
-    color: var(--color-text-faint);
-    padding: 0 1px;
+    font-size: 10px;
+    color: var(--ink-3);
+    font-weight: 500;
   }
 </style>

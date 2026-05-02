@@ -1,10 +1,15 @@
 <script>
+  import ArcGauge from '../graphics/ArcGauge.svelte';
+
   /**
+   * Hero output meter: half-circle arc + linear bar + Peak/Avg/Headroom stats.
+   *
    * @type {{
    *   value: number,
    *   max: number,
    *   unit?: string,
    *   peakHold?: number,
+   *   avg?: number,
    *   ticks?: number[],
    *   label?: string,
    * }}
@@ -14,118 +19,216 @@
     max = 1200,
     unit = 'W',
     peakHold = 0,
+    avg = 0,
     ticks = [],
-    label = 'OUTPUT POWER',
+    label = 'Output Power',
   } = $props();
 
   const pct = $derived(Math.max(0, Math.min(100, (value / max) * 100)));
-  const peakPct = $derived(peakHold ? Math.max(0, Math.min(100, (peakHold / max) * 100)) : 0);
-  const over = $derived(pct >= 90);
+  const dangerPct = $derived(Math.max(0, Math.min(100, ((max - max * 0.917) / max) * 100)));
+  const headroom = $derived(Math.max(0, Math.round(max - value)));
+  const dangerThreshold = $derived(max * 0.917); // mirror of design
+  const warnThreshold = $derived(max * 0.875);
+  const chipTone = $derived(value > dangerThreshold ? 'danger' : value > warnThreshold ? 'warn' : 'good');
+  const chipText = $derived(value > dangerThreshold ? 'Near Limit' : value > warnThreshold ? 'High Drive' : 'Within Spec');
+  const arcTicks = $derived(ticks.length ? [0, ...ticks] : [0, max * 0.25, max * 0.5, max * 0.75, max]);
 </script>
 
-<section class="output-meter" aria-label="Output power">
-  <div class="head">
-    <span class="label">{label}</span>
+<section class="hero card" aria-label={label}>
+  <div class="arc-wrap">
+    <ArcGauge value={value} max={max} ticks={arcTicks} dangerFrom={dangerThreshold} />
     <div class="readout">
-      <span class="num readout-val">{Math.round(value)}</span>
-      <span class="readout-unit">{unit}</span>
+      <div class="num-display">{Math.round(value).toLocaleString()}<span class="unit">{unit}</span></div>
+      <div class="lbl">{label}</div>
     </div>
   </div>
 
-  <div class="track">
-    <div class="fill" class:over style="width: {pct}%;"></div>
-    {#if peakPct > 0 && peakPct > pct}
-      <div class="peak" style="left: {peakPct}%;"></div>
-    {/if}
-    <div class="grid"></div>
-  </div>
+  <div class="right">
+    <div class="head">
+      <h2>Forward Power · 0–{max} W</h2>
+      <span class="chip {chipTone}">
+        <span class="d"></span>
+        {chipText}
+      </span>
+    </div>
 
-  <div class="ticks num">
-    <span>0</span>
-    {#each ticks as t}
-      <span>{t}</span>
-    {/each}
+    <div class="bar-track">
+      <div class="danger-zone" style="width:{100 - (dangerThreshold / max) * 100}%"></div>
+      <div class="bar-fill" style="width:{pct}%"></div>
+    </div>
+    <div class="bar-ticks num">
+      {#each [0, ...ticks, max].filter((v, i, a) => a.indexOf(v) === i) as t}
+        <span class:danger={t >= dangerThreshold}>{t}</span>
+      {/each}
+    </div>
+
+    <div class="stats">
+      <div class="s">
+        <div class="l">Peak</div>
+        <div class="v display">{Math.round(peakHold || 0).toLocaleString()}<span class="u">{unit}</span></div>
+      </div>
+      <div class="s">
+        <div class="l">Average</div>
+        <div class="v display">{Math.round(avg || 0).toLocaleString()}<span class="u">{unit}</span></div>
+      </div>
+      <div class="s">
+        <div class="l">Headroom</div>
+        <div class="v display">{headroom.toLocaleString()}<span class="u">{unit}</span></div>
+      </div>
+    </div>
   </div>
 </section>
 
 <style>
-  .output-meter {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    padding: 12px 14px 10px;
-    background: var(--color-surface);
-    border: 1px solid var(--color-border);
-    border-radius: 8px;
-    box-shadow: var(--shadow-card);
-    height: 100%;
-    justify-content: space-between;
+  .card {
+    background: var(--paper);
+    border: 1px solid var(--hairline);
+    border-radius: 14px;
+    padding: 20px 24px;
+  }
+  .hero {
+    display: grid;
+    grid-template-columns: minmax(220px, 320px) 1fr;
+    gap: 24px;
+    align-items: stretch;
   }
 
-  .head {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-  }
-  .readout { display: flex; align-items: baseline; gap: 6px; }
-  .readout-val {
-    font-size: var(--fs-2xl);
-    line-height: 0.9;
-    font-weight: 600;
-    color: var(--color-text-strong);
-    text-shadow: 0 0 18px var(--color-accent-glow);
-  }
-  .readout-unit {
-    font-size: var(--fs-md);
-    color: var(--color-text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-  }
-
-  .track {
+  .arc-wrap {
     position: relative;
-    height: 22px;
-    background: var(--gauge-track);
-    border: 1px solid var(--color-border-strong);
-    border-radius: 4px;
-    overflow: hidden;
+    aspect-ratio: 1.5 / 1;
+    min-height: 0;
   }
-  .fill {
+  .readout {
     position: absolute;
-    inset: 0 auto 0 0;
-    background: linear-gradient(180deg, var(--color-accent-hi) 0%, var(--gauge-fill) 55%, var(--color-accent-lo) 100%);
-    transition: width 60ms linear;
-    box-shadow: inset 0 0 10px var(--color-accent-glow), 0 0 12px var(--color-accent-glow);
-  }
-  .fill.over {
-    background: linear-gradient(180deg, #ff8a87 0%, var(--gauge-fill-over) 55%, #b8302d 100%);
-    box-shadow: inset 0 0 10px #ff4d4a44, 0 0 14px #ff4d4a55;
-  }
-  .peak {
-    position: absolute; top: -2px; bottom: -2px;
-    width: 2px;
-    background: var(--gauge-peak);
-    box-shadow: 0 0 6px #ffffff99;
-    transform: translateX(-1px);
-  }
-  .grid {
-    position: absolute; inset: 0;
-    background-image: repeating-linear-gradient(
-      to right,
-      transparent 0,
-      transparent calc(10% - 1px),
-      var(--gauge-tick) calc(10% - 1px),
-      var(--gauge-tick) 10%
-    );
-    opacity: 0.35;
+    left: 0; right: 0; bottom: 4px;
+    text-align: center;
     pointer-events: none;
   }
+  .num-display {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: var(--fs-hero);
+    color: var(--ink);
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+  .unit {
+    font-family: var(--font-ui);
+    font-size: 18px;
+    color: var(--ink-3);
+    margin-left: 6px;
+    font-weight: 500;
+  }
+  .lbl {
+    font-size: 12px;
+    color: var(--ink-3);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    font-weight: 600;
+    margin-top: 6px;
+  }
 
-  .ticks {
+  .right {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    justify-content: center;
+  }
+  .head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .head h2 {
+    margin: 0;
+    font-family: var(--font-ui);
+    font-weight: 600;
+    font-size: 13px;
+    letter-spacing: 0.18em;
+    color: var(--ink-3);
+    text-transform: uppercase;
+  }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    background: var(--paper);
+    border: 1px solid var(--hairline);
+    color: var(--ink-2);
+  }
+  .chip.good   { color: var(--good);   background: var(--good-tint);   border-color: var(--good-edge); }
+  .chip.warn   { color: var(--warn);   background: var(--warn-tint);   border-color: var(--warn-edge); }
+  .chip.danger { color: var(--danger); background: var(--danger-tint); border-color: var(--danger-edge); }
+  .chip .d { width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+  .chip.good .d { animation: pulse 1.6s infinite; }
+
+  .bar-track {
+    position: relative;
+    height: 18px;
+    border-radius: 9px;
+    background: var(--paper-2);
+    border: 1px solid var(--hairline);
+    overflow: hidden;
+  }
+  .bar-fill {
+    position: absolute;
+    inset: 1px auto 1px 1px;
+    background: linear-gradient(90deg, var(--brand) 0%, var(--brand-2) 100%);
+    border-radius: 8px;
+    transition: width 200ms cubic-bezier(.4,0,.2,1);
+  }
+  .danger-zone {
+    position: absolute;
+    top: 0; bottom: 0; right: 0;
+    background: repeating-linear-gradient(135deg,
+      rgba(200,50,75,0) 0 5px, rgba(200,50,75,.14) 5px 10px);
+    border-left: 1px dashed rgba(200,50,75,.4);
+  }
+
+  .bar-ticks {
     display: flex;
     justify-content: space-between;
-    font-size: var(--fs-xs);
-    color: var(--color-text-faint);
-    padding: 0 2px;
+    font-size: 11px;
+    color: var(--ink-3);
+    font-weight: 500;
+  }
+  .bar-ticks span.danger { color: var(--danger); }
+
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+  .s {
+    background: var(--paper-2);
+    border: 1px solid var(--hairline-2);
+    border-radius: 10px;
+    padding: 10px 14px;
+  }
+  .s .l {
+    font-size: 10px;
+    color: var(--ink-3);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+  .s .v {
+    font-weight: 600;
+    font-size: 22px;
+    color: var(--ink);
+    margin-top: 4px;
+    line-height: 1;
+  }
+  .s .v .u {
+    font-family: var(--font-ui);
+    font-size: 12px;
+    color: var(--ink-3);
+    margin-left: 4px;
+    font-weight: 500;
   }
 </style>
