@@ -8,8 +8,7 @@
   import AntennaTile from './lib/cards/AntennaTile.svelte';
   import BandTile from './lib/cards/BandTile.svelte';
   import SwrTile from './lib/cards/SwrTile.svelte';
-  import VoltTile from './lib/cards/VoltTile.svelte';
-  import TempTile from './lib/cards/TempTile.svelte';
+  import PowerThermalTile from './lib/cards/PowerThermalTile.svelte';
   import ControlButton from './lib/controls/ControlButton.svelte';
   import OperateToggle from './lib/controls/OperateToggle.svelte';
   import SettingsModal from './lib/settings/SettingsModal.svelte';
@@ -40,8 +39,21 @@
   const CURRENT_SCALES = { 600: 20, 1200: 40, 2400: 80 };
   const INPUT_MAX = 100;
 
-  const BANDS = ['160m', '80m', '40m', '30m', '20m', '17–15m', '12–10m', '6m'];
-  const BAND_FREQ = ['1.84 MHz', '3.65 MHz', '7.10 MHz', '10.10 MHz', '14.20 MHz', '18.10 MHz', '24.94 MHz', '50.10 MHz'];
+  // Display buttons (7) mapped to firmware band indices (0..7).
+  // 60-40 share one relay → firmware idx 2. 30-20 share one relay → firmware idx 3
+  // (we also accept idx 4 = legacy 20m reports and highlight the same button).
+  // cmdIdx is the firmware index sent on click; matchIdx are the firmware indices
+  // that highlight this button when reported by the device.
+  const BAND_BUTTONS = [
+    { label: '160',   freq: '1.84 MHz',  cmdIdx: 0, matchIdx: [0] },
+    { label: '80',    freq: '3.65 MHz',  cmdIdx: 1, matchIdx: [1] },
+    { label: '60-40', freq: '7.10 MHz',  cmdIdx: 2, matchIdx: [2] },
+    { label: '30-20', freq: '10.10 MHz', cmdIdx: 3, matchIdx: [3, 4] },
+    { label: '17-15', freq: '18.10 MHz', cmdIdx: 5, matchIdx: [5] },
+    { label: '12-10', freq: '24.94 MHz', cmdIdx: 6, matchIdx: [6] },
+    { label: '6',     freq: '50.10 MHz', cmdIdx: 7, matchIdx: [7] },
+  ];
+  const BAND_LABELS = BAND_BUTTONS.map(b => b.label);
   const ERRORS = {
     0: 'STATUS OK',
     1: 'ERR INPUT',
@@ -70,15 +82,35 @@
   const tempF = $derived(Math.round(tempC * 18 / 10 + 32));
   const voltage = $derived(stateMeters.p5 / 10);
 
+  // ---- Canvas scaling ----
+  // The whole UI is laid out in a fixed 1280×768 design canvas (5:3, matches
+  // the Nextion 7" target). On bigger viewports we scale the canvas up via
+  // `transform: scale()`; on smaller ones it scales down. Aspect mismatches
+  // letterbox — we never reflow except for portrait phones.
+  const DESIGN_W = 1280;
+  const DESIGN_H = 768;
+  function updateCanvasScale() {
+    const scale = Math.min(window.innerWidth / DESIGN_W, window.innerHeight / DESIGN_H);
+    const tx = (window.innerWidth  - DESIGN_W * scale) / 2;
+    const ty = (window.innerHeight - DESIGN_H * scale) / 2;
+    const root = document.documentElement.style;
+    root.setProperty('--canvas-scale', String(scale));
+    root.setProperty('--canvas-tx', `${tx}px`);
+    root.setProperty('--canvas-ty', `${ty}px`);
+  }
+
   // ---- Wire up IPC events ----
   let unsubPacket;
   let unsubConn;
   let unsubErr;
 
   onMount(async () => {
+    updateCanvasScale();
+    window.addEventListener('resize', updateCanvasScale);
+
     if (!window.api) {
       console.warn('window.api missing — preload not loaded');
-      return;
+      return () => window.removeEventListener('resize', updateCanvasScale);
     }
 
     await loadSettings();
@@ -111,6 +143,7 @@
     }
 
     return () => {
+      window.removeEventListener('resize', updateCanvasScale);
       unsubPacket?.();
       unsubConn?.();
       unsubErr?.();
@@ -160,10 +193,16 @@
   }
 
   const catManual = $derived(settings.cat === 5);
-  function onBandSelect(i) {
+  // Active display-button index derived from the firmware band index.
+  const activeBandButton = $derived(
+    BAND_BUTTONS.findIndex(b => b.matchIdx.includes(deviceState.band))
+  );
+  function onBandSelect(displayIdx) {
     if (!catManual) return;
-    send(String(71 + i));
-    deviceState.band = i;
+    const btn = BAND_BUTTONS[displayIdx];
+    if (!btn) return;
+    send(String(71 + btn.cmdIdx));
+    deviceState.band = btn.cmdIdx;
   }
   function onVoltsToggle() {
     const next = !deviceState.voltsPlus;
@@ -187,6 +226,7 @@
   const fanTone = $derived(deviceState.fanFull ? 'fan' : 'idle');
 </script>
 
+<div class="fit-to-screen">
 <div class="app-shell">
   <HeaderBar
     onneedsetup={onNeedSetup}
@@ -267,25 +307,23 @@
           onselect={onAntennaSelect} />
 
         <BandTile
-          bands={BANDS}
-          activeIndex={deviceState.band}
-          freq={BAND_FREQ[deviceState.band] || ''}
+          bands={BAND_LABELS}
+          activeIndex={activeBandButton}
+          freq={BAND_BUTTONS[activeBandButton]?.freq || ''}
           enabled={catManual}
           onselect={onBandSelect} />
 
         <SwrTile value={swrVal} />
 
-        <VoltTile
-          value={voltage}
+        <PowerThermalTile
+          volts={voltage}
           plus={deviceState.voltsPlus}
-          ontoggle={onVoltsToggle} />
-
-        <TempTile
-          value={settings.showFahrenheit ? tempF : tempC}
-          unit={settings.showFahrenheit ? '°F' : '°C'}
-          warnAt={settings.showFahrenheit ? 130 : 55}
-          dangerAt={settings.showFahrenheit ? 165 : 75}
-          max={settings.showFahrenheit ? 250 : 120} />
+          onvolts={onVoltsToggle}
+          temp={settings.showFahrenheit ? tempF : tempC}
+          tempUnit={settings.showFahrenheit ? '°F' : '°C'}
+          tempWarnAt={settings.showFahrenheit ? 130 : 55}
+          tempDangerAt={settings.showFahrenheit ? 165 : 75}
+          tempMax={settings.showFahrenheit ? 250 : 120} />
       </div>
 
       <!-- Controls -->
@@ -302,60 +340,86 @@
   <SettingsModal bind:open={settingsOpen} onclose={() => settingsOpen = false} />
   <DiagnosticsView bind:open={diagOpen} onclose={() => diagOpen = false} />
 </div>
+</div>
 
 <style>
+  /* Letterbox wrapper — fills viewport, never scrolls. The dark backdrop
+     fills any aspect-ratio mismatch around the centered canvas. */
+  .fit-to-screen {
+    position: fixed;
+    inset: 0;
+    background: #0a0e1f;
+    overflow: hidden;
+  }
+
+  /* Fixed 1280×768 design canvas. Positioned at viewport (0,0); JS computes
+     the letterbox offsets and scale on resize and exposes them as CSS vars.
+     transform-origin: 0 0 keeps the math simple — translate first, then
+     scale, with no percentage gymnastics. */
   .app-shell {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 1280px;
+    height: 768px;
     display: grid;
     grid-template-rows: 64px 1fr;
-    height: 100vh;
     background: var(--bg);
+    transform-origin: 0 0;
+    transform:
+      translate(var(--canvas-tx, 0px), var(--canvas-ty, 0px))
+      scale(var(--canvas-scale, 1));
+    border-radius: 6px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
   }
 
   .main {
-    padding: 24px 28px;
-    overflow: auto;
+    padding: 16px 18px;
     display: flex;
     flex-direction: column;
     min-height: 0;
   }
 
+  /* Panel rows are sized to fill exactly the available height
+     (768 - 64 header - 32 main pad - 28 panel pad = 644px content).
+     Hero 200 + Sub 130 + Status 44 + Secondary 200 + Controls 52
+     + 4 × 12px gap = 674. We give the secondary row 1fr so it
+     absorbs any rounding slack without overflow. */
   .panel {
     background: var(--paper);
     border: 1px solid var(--hairline);
-    border-radius: 18px;
+    border-radius: 14px;
     box-shadow: var(--shadow-panel);
-    padding: 20px 22px 24px;
+    padding: 14px 14px;
     display: grid;
-    /* Hero, sub-meters, and secondary tiles all absorb extra vertical space;
-       status bar and controls stay at their natural height. */
     grid-template-rows:
-      minmax(180px, 1.4fr)   /* hero output meter */
-      minmax(160px, 1fr)     /* reflected / input / current */
-      auto                    /* status bar */
-      minmax(180px, 1.3fr)   /* antenna / band / swr / volts / temp */
-      auto;                   /* controls */
-    gap: 16px;
-    width: 100%;
-    margin: 0 auto;
+      200px   /* hero output meter */
+      130px   /* reflected / input / current */
+      44px    /* status bar */
+      1fr     /* antenna · band · swr · power+thermal */
+      52px;   /* controls */
+    gap: 12px;
     flex: 1 1 auto;
     min-height: 0;
+    overflow: hidden;
   }
 
   .sub-meters {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 16px;
+    gap: 12px;
+    min-height: 0;
   }
 
   .statusbar {
     display: flex;
-    gap: 12px;
+    gap: 10px;
     align-items: stretch;
-    padding: 12px;
+    padding: 6px 10px;
     background: var(--paper-2);
     border: 1px solid var(--hairline);
-    border-radius: 14px;
-    height: 52px;
+    border-radius: 12px;
   }
   .stat-rest {
     margin-left: auto;
@@ -380,65 +444,25 @@
     font-family: var(--font-num);
   }
 
+  /* antenna · band · swr · power+thermal — single row, fixed proportions. */
   .secondary {
     display: grid;
-    grid-template-columns: 1.4fr 1.6fr 1fr 1fr 1fr;
-    gap: 16px;
+    grid-template-columns: 1fr 2.4fr 1fr 1.5fr;
+    grid-template-rows: minmax(0, 1fr);
+    gap: 12px;
+    min-height: 0;
   }
 
   .controls {
     display: grid;
     grid-template-columns: 2fr repeat(4, 1fr);
-    gap: 12px;
+    gap: 10px;
   }
 
-  /* Narrower laptops — keep all 5 secondary tiles in one row but tighter. */
-  @media (max-width: 1280px) {
-    .secondary {
-      grid-template-columns: 1.3fr 1.5fr repeat(3, minmax(0, 1fr));
-      gap: 12px;
-    }
-  }
-
-  /* Tablet-ish — drop secondary to 3 cols, keep controls in one row. */
-  @media (max-width: 1080px) {
-    .secondary {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-  }
-
-  /* Cramped windows — sub-meters wrap, controls go to 2 rows. */
-  @media (max-width: 820px) {
-    .sub-meters {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-    .secondary {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-    .controls {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-    .stat-rest { gap: 12px; }
-  }
-
-  /* Very narrow — single column stack. */
-  @media (max-width: 560px) {
-    .main { padding: 14px 14px; }
-    .panel { padding: 14px 14px 16px; }
-    .sub-meters,
-    .secondary,
-    .controls {
-      grid-template-columns: 1fr;
-    }
-    .statusbar {
-      flex-wrap: wrap;
-      height: auto;
-      padding: 10px;
-    }
-    .stat-rest {
-      width: 100%;
-      justify-content: space-between;
-      padding-right: 0;
-    }
+  /* Portrait reflow stub — when (and if) we build a phone layout, this is
+     where the alternative grid lives. For now it intentionally does nothing
+     so portrait viewports just letterbox like everything else. */
+  @media (orientation: portrait) and (max-aspect-ratio: 4/5) {
+    /* TODO: phone-specific stacked layout */
   }
 </style>

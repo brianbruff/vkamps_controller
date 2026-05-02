@@ -62,7 +62,7 @@
   .gauge { margin: -2px 0 4px; }
   .v {
     font-weight: 700;
-    font-size: clamp(28px, 4vh, 48px);
+    font-size: 32px;
     color: var(--ink);
     line-height: 1;
   }

@@ -58,6 +58,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 8px;
   }
   .l {
     color: var(--ink-3);
@@ -65,12 +66,18 @@
     letter-spacing: 0.18em;
     text-transform: uppercase;
     font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
   }
   .sub {
     font-family: var(--font-num);
     font-size: 11px;
     color: var(--ink-3);
     font-weight: 500;
+    white-space: nowrap;
+    flex-shrink: 0;
   }
 
   .ant-row {
@@ -102,14 +109,14 @@
     color: var(--brand);
   }
   .a .icon {
-    height: clamp(22px, 3vh, 36px);
+    height: 28px;
     display: grid;
     place-items: center;
     color: currentColor;
   }
   .a .num {
     font-weight: 700;
-    font-size: clamp(22px, 3vh, 38px);
+    font-size: 28px;
     line-height: 1;
   }
   .a .nm {

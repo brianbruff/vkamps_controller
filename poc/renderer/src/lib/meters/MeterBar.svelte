@@ -141,7 +141,7 @@
 
   .val {
     font-weight: 700;
-    font-size: clamp(32px, 4.4vh, 56px);
+    font-size: 38px;
     color: var(--ink);
     line-height: 1;
     white-space: nowrap;

@@ -1,7 +1,7 @@
 <script>
   /**
-   * Band ribbon tile. The list of bands is configurable so it works with the
-   * existing 8-slot CAT band table from the firmware.
+   * Band ribbon tile. The highlighted segment IS the value display — no
+   * separate big readout is shown.
    *
    * @type {{
    *   bands: string[],
@@ -18,21 +18,17 @@
     onselect,
     enabled = true,
   } = $props();
-
-  const activeLabel = $derived(bands[activeIndex] ?? '—');
-  const labelText = $derived(activeLabel.replace(/m$/i, ''));
 </script>
 
 <div class="tile" class:disabled={!enabled}>
   <div class="head">
     <span class="l">Band</span>
-    <div class="v display">{labelText}<span class="u">m</span></div>
+    {#if freq}
+      <span class="freq">{freq}</span>
+    {/if}
   </div>
-  {#if freq}
-    <div class="sub">{freq}</div>
-  {/if}
 
-  <div class="ribbon" style="grid-template-columns: repeat({bands.length}, 1fr);">
+  <div class="ribbon" style="--band-count: {bands.length};">
     {#each bands as b, i}
       <button type="button"
               class="seg"
@@ -51,18 +47,22 @@
     background: var(--paper);
     border: 1px solid var(--hairline);
     border-radius: 14px;
-    padding: 16px 18px;
+    padding: 14px 16px;
     display: flex;
     flex-direction: column;
     gap: 8px;
     height: 100%;
+    overflow: hidden;
+    min-height: 0;
   }
   .tile.disabled { opacity: 0.6; }
 
   .head {
     display: flex;
-    align-items: center;
+    align-items: baseline;
     justify-content: space-between;
+    gap: 12px;
+    flex: 0 0 auto;
   }
   .l {
     color: var(--ink-3);
@@ -71,58 +71,55 @@
     text-transform: uppercase;
     font-weight: 600;
   }
-  .v {
-    font-weight: 700;
-    font-size: clamp(26px, 4.5vh, 48px);
-    color: var(--ink);
-    line-height: 1;
-  }
-  .v .u {
-    font-family: var(--font-ui);
-    font-size: 13px;
-    color: var(--ink-3);
-    margin-left: 4px;
-    font-weight: 500;
-  }
-  .sub {
+  .freq {
     font-family: var(--font-num);
-    font-size: 11px;
-    color: var(--ink-3);
-    font-weight: 500;
+    font-size: 12px;
+    color: var(--ink-2);
+    font-weight: 600;
   }
 
   .ribbon {
-    margin-top: 4px;
     display: grid;
-    gap: 4px;
+    grid-template-columns: repeat(var(--band-count, 7), minmax(0, 1fr));
+    gap: 6px;
     flex: 1 1 auto;
-    min-height: 38px;
-    max-height: 80px;
-    border-radius: 8px;
+    min-height: 0;
+    border-radius: 10px;
     border: 1px solid var(--hairline-2);
     background: var(--paper-2);
-    padding: 4px;
-    position: relative;
+    padding: 6px;
   }
   .seg {
-    border-radius: 4px;
-    background: var(--brand-4);
-    border: none;
+    border-radius: 8px;
+    background: var(--paper);
+    border: 1px solid var(--hairline-2);
     cursor: pointer;
-    color: var(--ink-3);
+    color: var(--ink-2);
     font-family: var(--font-num);
-    font-size: clamp(9px, 1.4vh, 14px);
-    font-weight: 600;
-    transition: background 120ms, color 120ms;
+    font-weight: 700;
+    font-size: 14px;
+    transition: background 120ms, color 120ms, border-color 120ms;
     display: grid;
     place-items: center;
     line-height: 1;
+    overflow: hidden;
+    padding: 4px 2px;
+    min-width: 0;
   }
-  .seg:hover:not(:disabled) { background: var(--brand-2); color: #fff; }
+  .seg .lab {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: clip;
+    max-width: 100%;
+  }
+  .seg:hover:not(:disabled) {
+    border-color: var(--brand-2);
+    color: var(--brand);
+  }
   .seg:disabled { cursor: default; }
   .seg.on {
     background: var(--brand);
+    border-color: var(--brand);
     color: #fff;
   }
-  .lab { display: block; }
 </style>

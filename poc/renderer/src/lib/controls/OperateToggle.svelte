@@ -86,7 +86,5 @@
   }
   .seg:disabled { cursor: default; }
 
-  @media (max-width: 720px) {
-    .seg .micro { display: none; }
-  }
+  .seg .lbl { white-space: nowrap; }
 </style>
