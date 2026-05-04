@@ -162,8 +162,8 @@
   const catManual = $derived(settings.cat === 5);
   function onBandSelect(i) {
     if (!catManual) return;
-    send(String(71 + i));
-    deviceState.band = i;
+    send(String(71 + i)); // Send command 71-78
+    deviceState.band = i + 1; // Store as 1-8 to match device
   }
   function onVoltsToggle() {
     const next = !deviceState.voltsPlus;
@@ -268,8 +268,8 @@
 
         <BandTile
           bands={BANDS}
-          activeIndex={deviceState.band}
-          freq={BAND_FREQ[deviceState.band] || ''}
+          activeIndex={deviceState.band - 1}
+          freq={BAND_FREQ[deviceState.band - 1] || ''}
           enabled={catManual}
           onselect={onBandSelect} />
 
