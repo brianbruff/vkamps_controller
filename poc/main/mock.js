@@ -15,7 +15,7 @@ class MockTransport extends EventEmitter {
     this.tickCount = 0;
     this.txOn = false;
     this.injectError = 0;
-    this.band = 3;       // 30m default
+    this.band = 4;       // 30m default (device uses 1-8, where 4=30m)
     this.antenna = 1;
     this.bypass = 0;
     this.voltsPlus = false;
@@ -99,7 +99,7 @@ class MockTransport extends EventEmitter {
     else if (c === '42') this.voltsPlus = true;
     else if (c === '45') this.fanFull = true;
     else if (c === '46') this.fanFull = false;
-    else if (/^7[1-8]$/.test(c)) this.band = Number(c[1]) - 1;
+    else if (/^7[1-8]$/.test(c)) this.band = Number(c[1]);  // Store as 1-8 like device
     // 11, 99, 51-54, 61-66 accepted with no state change
   }
 
