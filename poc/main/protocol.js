@@ -77,7 +77,7 @@ function parseTcpPacket(str) {
   return {
     p3: parts[0],   // temperature raw
     p5: parts[1],   // voltage (tenths)
-    p6: parts[2],   // band index
+    p6: parts[2] - 1,   // band index (device sends 1-8, convert to 0-7)
     p7: parts[3],   // antenna (1/2/3)
     p8: parts[4],   // error code
     p9: parts[5],   // device status (0=OK)

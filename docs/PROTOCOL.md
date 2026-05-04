@@ -58,7 +58,7 @@ p3,p5,p6,p7,p8,p9,p10,p11
 
 p3  = temperature raw  → °C display; °F = 18*p3/10 + 32
 p5  = voltage (×10)    → display = p5/10 V
-p6  = band index
+p6  = band index (1-8: 1=160m, 2=80m, 3=40m, 4=30m, 5=20m, 6=17-15m, 7=12-10m, 8=6m)
 p7  = antenna (1/2/3)
 p8  = error code (0=OK, 1=input pwr, 2=power, 3=REF)
 p9  = device status (0=OK, !0=error/offline)

@@ -366,7 +366,7 @@ export type EightField = {
   kind: 'state';        // corresponds to TCP packet / serial 8-field
   p3: number;           // temperature raw
   p5: number;           // voltage * 10
-  p6: number;           // band index 0..7
+  p6: number;           // band index 1..8 from device (converted to 0..7 internally)
   p7: number;           // antenna 1..3
   p8: 0 | 1 | 2 | 3;    // error code
   p9: number;           // device status, 0 = OK
@@ -395,7 +395,7 @@ const tick = 20;
 let t = 0;          // seconds
 let txOn = false;   // toggled by Mock TX button
 let injectError: 0 | 1 | 2 | 3 = 0;
-let band = 3;       // 30m default
+let band = 4;       // 30m default (device uses 1-8, where 4=30m)
 let antenna = 1;
 let bypass = 0;
 let voltsPlus = false;
